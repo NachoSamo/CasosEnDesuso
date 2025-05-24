@@ -7,26 +7,32 @@ public class CambioEstado {
     private LocalDateTime fechaHoraFin;
     private Estado estado;
 
-     public LocalDateTime getFechaHoraInicio() {
+    // Constructor
+    public CambioEstado(LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin, Estado estado) {
+        this.fechaHoraInicio = fechaHoraInicio;
+        this.fechaHoraFin = fechaHoraFin;
+        this.estado = estado;
+    }
+    // Getters y Setters
+    public LocalDateTime getFechaHoraInicio() {
         return fechaHoraInicio;
     }
-
     public void setFechaHoraInicio(LocalDateTime fechaHoraInicio) {
         this.fechaHoraInicio = fechaHoraInicio;
     }
-
     public LocalDateTime getFechaHoraFin() {
         return fechaHoraFin;
     }
-
     public void setFechaHoraFin(LocalDateTime fechaHoraFin) {
         this.fechaHoraFin = fechaHoraFin;
     }
-
     public Estado getEstado() {
         return estado;
     }
     public void setEstado(Estado estado) {
         this.estado = estado;
+    }
+    public Boolean sosActual() {
+        return fechaHoraFin == null;
     }
 }
