@@ -47,6 +47,6 @@ public class Empleado {
         this.usuario = usuario;
     }
     public Boolean esTuUsuario(Usuario usuario) {
-        return this.usuario.getUsuario().equals(usuario);// el .username es para acceder al atributo username de Usuario y .getUsername() es para acceder al valor del atributo username
+        return this.usuario.getUsername().equals(usuario.getUsername());// el .username es para acceder al atributo username de Usuario y .getUsername() es para acceder al valor del atributo username
     }
 }

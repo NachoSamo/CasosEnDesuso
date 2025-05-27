@@ -1,6 +1,9 @@
 package entidades;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.ArrayList;
 
 public class EventoSismico {
     private LocalDateTime fechaHoraFin;
@@ -159,5 +162,5 @@ public class EventoSismico {
     }
 
     public Boolean esPendienteDeRevision() {
-        return this.estado.soyPendienteDeRevision;
-    }
+        return this.estado.getNombre().equals("PendienteDeRevision");
+    }}
