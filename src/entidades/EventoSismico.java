@@ -1,6 +1,7 @@
 package entidades;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 
 public class EventoSismico {
     private LocalDateTime fechaHoraFin;
@@ -12,7 +13,7 @@ public class EventoSismico {
     private double valorMagnitud;
     private LocalDateTime fechaHoraRevision;
     private Empleado responsableRevision;
-    private List<CambioEstado> cambiosEstado;
+    private ArrayList<CambioEstado> cambiosEstado;
     private Estado estado;
     private ClasificacionSismo clasificacionSismo;
     private AlcanceSismo alcanceSismo;
@@ -161,3 +162,56 @@ public class EventoSismico {
     public Boolean esPendienteDeRevision() {
         return this.estado.soyPendienteDeRevision;
     }
+
+    /*CAMBIAR!!!!!!!
+    public Map<String, Object> getDatos() {
+        Map<String, Object> datos = new HashMap<>();
+        datos.put("fechaHoraOcurrencia", getFechaHoraOcurrencia());
+        datos.put("coordEpicentro", getCoordEpicentro());
+        datos.put("coordHipocentro", getCoordHipocentro());
+        datos.put("magnitud", getValorMagnitud());
+        return datos;
+    } */
+   public getDatos() {
+        return getFechaHoraOcurrencia(), getLatitudEpicentro(), getLongitudEpicentro(), getLatitudHipocentro(),
+            "longitudHipocentro", getLongitudHipocentro(),
+            "magnitud", getValorMagnitud()
+        );
+   }
+
+    /**
+     * Cambia el estado del evento sísmico.
+     * @param nuevoEstado El nuevo estado a asignar.
+     * @param fechaCambio La fecha y hora del cambio de estado.
+     */
+    public void revisar(Estado nuevoEstado, LocalDateTime fechaCambio) {
+        // Cierra el cambio de estado actual si existe
+        CambioEstado ultimoCambio = buscarCEActual();
+        if (ultimoCambio != null) {
+            ultimoCambio.setFechaHoraFin(fechaCambio); // Cierra el último cambio de estado
+        }
+        // Crea un nuevo cambio de estado
+       crearNuevoCE(fechaCambio, null, nuevoEstado);
+        // Actualiza el estado actual
+        setEstado(nuevoEstado);
+    }
+
+    public CambioEstado buscarCEActual() {
+        if (cambiosEstado.isEmpty()) {
+            return null; // No hay cambios de estado
+        }
+        CambioEstado ultimoCambio = cambiosEstado.get(cambiosEstado.size() - 1);
+        return ultimoCambio.sosActual() ? ultimoCambio : null; // Retorna el último cambio si es actual
+    }
+
+    public void crearNuevoCE(LocalDateTime fechaCambio, null, Estado estado) {
+        CambioEstado nuevoCambio = new CambioEstado(fechaCambio, null, estado);
+        cambiosEstado.add(nuevoCambio);
+    }
+
+    public String getACO() { //sabra dios
+        return this.alcanceSismo.getAlcanceSismo().getNombre(), this.clasificacionSismo.getNombre(), this.origenGeneracion.getNombre();
+    }
+
+
+}
