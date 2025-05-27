@@ -1,0 +1,17 @@
+# Maven
+/target/
+
+# IntelliJ
+/.idea/
+/*.iml
+/out/
+
+# NetBeans
+/nbproject/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
