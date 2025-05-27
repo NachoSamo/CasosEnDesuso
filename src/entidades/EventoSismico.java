@@ -10,29 +10,31 @@ public class EventoSismico {
     private String latitudHipocentro;
     private String longitudHipocentro;
     private double valorMagnitud;
+    private LocalDateTime fechaHoraRevision;
+    private Empleado responsableRevision;
     private List<CambioEstado> cambiosEstado;
     private Estado estado;
-    private MagnitudRichter magnitudRichter;
     private ClasificacionSismo clasificacionSismo;
     private AlcanceSismo alcanceSismo;
     private OrigenDeGeneracion origenGeneracion;
     private List<SerieTemporal> seriesTemporales;
 
     // Constructor
-    public EventoSismico(LocalDateTime fechaHoraOcurrencia, String latitudEpicentro, String longitudEpicentro, String latitudHipocentro, String longitudHipocentro, double valorMagnitud, List<CambioEstado> cambiosEstado, Estado estado, MagnitudRichter magnitudRichter, ClasificacionSismo clasificacionSismo, AlcanceSismo alcanceSismo, OrigenDeGeneracion origenGeneracion, List<SerieTemporal> seriesTemporales) {
+    public EventoSismico(LocalDateTime fechaHoraOcurrencia, String latitudEpicentro, String longitudEpicentro,
+                         String latitudHipocentro, String longitudHipocentro, double valorMagnitud,
+                         ClasificacionSismo clasificacionSismo, AlcanceSismo alcanceSismo,
+                         OrigenDeGeneracion origenGeneracion) {
         this.fechaHoraOcurrencia = fechaHoraOcurrencia;
         this.latitudEpicentro = latitudEpicentro;
         this.longitudEpicentro = longitudEpicentro;
         this.latitudHipocentro = latitudHipocentro;
         this.longitudHipocentro = longitudHipocentro;
         this.valorMagnitud = valorMagnitud;
-        this.cambiosEstado = cambiosEstado;
-        this.estado = estado;
-        this.magnitudRichter = magnitudRichter;
         this.clasificacionSismo = clasificacionSismo;
         this.alcanceSismo = alcanceSismo;
         this.origenGeneracion = origenGeneracion;
-        this.seriesTemporales = seriesTemporales;
+        this.cambiosEstado = new ArrayList<>();
+        this.seriesTemporales = new ArrayList<>();
     }
     // Getters y Setters
     //CAMBIAR LOS METODOS QUE REFERENCIAN
@@ -108,14 +110,6 @@ public class EventoSismico {
         this.estado = estado;
     }
 
-    public MagnitudRichter getMagnitudRichter() {
-        return magnitudRichter;
-    }
-
-    public void setMagnitudRichter(MagnitudRichter magnitudRichter) {
-        this.magnitudRichter = magnitudRichter;
-    }
-
     public ClasificacionSismo getClasificacionSismo() {
         return clasificacionSismo;
     }
@@ -147,4 +141,23 @@ public class EventoSismico {
     public void setSeriesTemporales(List<SerieTemporal> seriesTemporales) {
         this.seriesTemporales = seriesTemporales;
     }
-}
+
+    public LocalDateTime getFechaHoraRevision() {
+        return fechaHoraRevision;
+    }
+
+    public void setFechaHoraRevision(LocalDateTime fechaHoraRevision) {
+        this.fechaHoraRevision = fechaHoraRevision;
+    }
+
+    public Empleado getResponsableRevision() {
+        return responsableRevision;
+    }
+
+    public void setResponsableRevision(Empleado responsableRevision) {
+        this.responsableRevision = responsableRevision;
+    }
+
+    public Boolean esPendienteDeRevision() {
+        return this.estado.soyPendienteDeRevision;
+    }
