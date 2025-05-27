@@ -1,11 +1,11 @@
 package entidades;
 
-public class Alcance {
+public class AlcanceSismo {
     private String nombre;
     private String descripcion;
 
     // Constructor
-    public Alcance(String nombre, String descripcion) {
+    public AlcanceSismo(String nombre, String descripcion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
     }

@@ -1,74 +1,89 @@
 package entidades;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class EventoSismico {
-    //atributos
+    private LocalDateTime fechaHoraFin;
     private LocalDateTime fechaHoraOcurrencia;
-    private int latitudEpicentro;
-    private int longitudEpicentro;
-    private double profundidadEpicentro;
+    private String latitudEpicentro;
+    private String longitudEpicentro;
+    private String latitudHipocentro;
+    private String longitudHipocentro;
     private double valorMagnitud;
-    private String responsableRevision;
-    private boolean esPendienteRevision;
-    private int id;
-    private Estado estado; 
-    private Origen origen; 
-    private Magnitud magnitud;
-    private ClasificacionSismo clasificacionSismo;
-    private Alcance alcance;
+    private LocalDateTime fechaHoraRevision;
+    private Empleado responsableRevision;
     private List<CambioEstado> cambiosEstado;
-    
+    private Estado estado;
+    private ClasificacionSismo clasificacionSismo;
+    private AlcanceSismo alcanceSismo;
+    private OrigenDeGeneracion origenGeneracion;
+    private List<SerieTemporal> seriesTemporales;
+
     // Constructor
-    public EventoSismico(LocalDateTime fechaHoraOcurrencia, int latitudEpicentro, int longitudEpicentro, 
-                         double profundidadEpicentro, double valorMagnitud, String responsableRevision, 
-                         boolean esPendienteRevision, int id, Estado estado, Origen origen, 
-                         Magnitud magnitud, ClasificacionSismo clasificacionSismo, Alcance alcance) {
+    public EventoSismico(LocalDateTime fechaHoraOcurrencia, String latitudEpicentro, String longitudEpicentro,
+                         String latitudHipocentro, String longitudHipocentro, double valorMagnitud,
+                         ClasificacionSismo clasificacionSismo, AlcanceSismo alcanceSismo,
+                         OrigenDeGeneracion origenGeneracion) {
         this.fechaHoraOcurrencia = fechaHoraOcurrencia;
         this.latitudEpicentro = latitudEpicentro;
         this.longitudEpicentro = longitudEpicentro;
-        this.profundidadEpicentro = profundidadEpicentro;
+        this.latitudHipocentro = latitudHipocentro;
+        this.longitudHipocentro = longitudHipocentro;
         this.valorMagnitud = valorMagnitud;
-        this.responsableRevision = responsableRevision;
-        this.esPendienteRevision = esPendienteRevision;
-        this.id = id;
-        this.estado = estado;
-        this.origen = origen;
-        this.magnitud = magnitud;
         this.clasificacionSismo = clasificacionSismo;
-        this.alcance = alcance;
-        this.cambiosEstado = null; // Inicializar como null o una lista vacía según sea necesario
-
+        this.alcanceSismo = alcanceSismo;
+        this.origenGeneracion = origenGeneracion;
+        this.cambiosEstado = new ArrayList<>();
+        this.seriesTemporales = new ArrayList<>();
     }
     // Getters y Setters
+    //CAMBIAR LOS METODOS QUE REFERENCIAN
+    public LocalDateTime getFechaHoraFin() {
+        return fechaHoraFin;
+    }
+
+    public void setFechaHoraFin(LocalDateTime fechaHoraFin) {
+        this.fechaHoraFin = fechaHoraFin;
+    }
+
     public LocalDateTime getFechaHoraOcurrencia() {
         return fechaHoraOcurrencia;
     }
+
     public void setFechaHoraOcurrencia(LocalDateTime fechaHoraOcurrencia) {
         this.fechaHoraOcurrencia = fechaHoraOcurrencia;
     }
-    public int getLatitudEpicentro() {
+
+    public String getLatitudEpicentro() {
         return latitudEpicentro;
     }
-    public void setLatitudEpicentro(int latitudEpicentro) {
+
+    public void setLatitudEpicentro(String latitudEpicentro) {
         this.latitudEpicentro = latitudEpicentro;
     }
 
-    public int getLongitudEpicentro() {
+    public String getLongitudEpicentro() {
         return longitudEpicentro;
     }
 
-    public void setLongitudEpicentro(int longitudEpicentro) {
+    public void setLongitudEpicentro(String longitudEpicentro) {
         this.longitudEpicentro = longitudEpicentro;
     }
 
-    public double getProfundidadEpicentro() {
-        return profundidadEpicentro;
+    public String getLatitudHipocentro() {
+        return latitudHipocentro;
     }
 
-    public void setProfundidadEpicentro(double profundidadEpicentro) {
-        this.profundidadEpicentro = profundidadEpicentro;
+    public void setLatitudHipocentro(String latitudHipocentro) {
+        this.latitudHipocentro = latitudHipocentro;
+    }
+
+    public String getLongitudHipocentro() {
+        return longitudHipocentro;
+    }
+
+    public void setLongitudHipocentro(String longitudHipocentro) {
+        this.longitudHipocentro = longitudHipocentro;
     }
 
     public double getValorMagnitud() {
@@ -79,28 +94,12 @@ public class EventoSismico {
         this.valorMagnitud = valorMagnitud;
     }
 
-    public String getResponsableRevision() {
-        return responsableRevision;
+    public List<CambioEstado> getCambiosEstado() {
+        return cambiosEstado;
     }
 
-    public void setResponsableRevision(String responsableRevision) {
-        this.responsableRevision = responsableRevision;
-    }
-
-    public boolean isEsPendienteRevision() {
-        return esPendienteRevision;
-    }
-
-    public void setEsPendienteRevision(boolean esPendienteRevision) {
-        this.esPendienteRevision = esPendienteRevision;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public void setCambiosEstado(List<CambioEstado> cambiosEstado) {
+        this.cambiosEstado = cambiosEstado;
     }
 
     public Estado getEstado() {
@@ -111,22 +110,6 @@ public class EventoSismico {
         this.estado = estado;
     }
 
-    public Origen getOrigen() {
-        return origen;
-    }
-
-    public void setOrigen(Origen origen) {
-        this.origen = origen;
-    }
-
-    public Magnitud getMagnitud() {
-        return magnitud;
-    }
-
-    public void setMagnitud(Magnitud magnitud) {
-        this.magnitud = magnitud;
-    }
-
     public ClasificacionSismo getClasificacionSismo() {
         return clasificacionSismo;
     }
@@ -135,19 +118,46 @@ public class EventoSismico {
         this.clasificacionSismo = clasificacionSismo;
     }
 
-    public Alcance getAlcance() {
-        return alcance;
+    public AlcanceSismo getAlcanceSismo() {
+        return alcanceSismo;
     }
 
-    public void setAlcance(Alcance alcance) {
-        this.alcance = alcance;
+    public void setAlcanceSismo(AlcanceSismo alcanceSismo) {
+        this.alcanceSismo = alcanceSismo;
     }
 
-    public List<CambioEstado> getCambiosEstado() {
-        return cambiosEstado;
+    public OrigenDeGeneracion getOrigenGeneracion() {
+        return origenGeneracion;
     }
 
-    public void setCambiosEstado(List<CambioEstado> cambiosEstado) {
-        this.cambiosEstado = cambiosEstado;
+    public void setOrigenGeneracion(OrigenDeGeneracion origenGeneracion) {
+        this.origenGeneracion = origenGeneracion;
     }
-}
+
+    public List<SerieTemporal> getSeriesTemporales() {
+        return seriesTemporales;
+    }
+
+    public void setSeriesTemporales(List<SerieTemporal> seriesTemporales) {
+        this.seriesTemporales = seriesTemporales;
+    }
+
+    public LocalDateTime getFechaHoraRevision() {
+        return fechaHoraRevision;
+    }
+
+    public void setFechaHoraRevision(LocalDateTime fechaHoraRevision) {
+        this.fechaHoraRevision = fechaHoraRevision;
+    }
+
+    public Empleado getResponsableRevision() {
+        return responsableRevision;
+    }
+
+    public void setResponsableRevision(Empleado responsableRevision) {
+        this.responsableRevision = responsableRevision;
+    }
+
+    public Boolean esPendienteDeRevision() {
+        return this.estado.soyPendienteDeRevision;
+    }
