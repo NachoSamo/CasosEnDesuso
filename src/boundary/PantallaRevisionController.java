@@ -27,6 +27,7 @@ public class PantallaRevisionController {
 
     @FXML
     public void initialize() {
+        controladorCU.registrarResultadoDeRevMan();
         controladorCU.cargarEventos(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud, colSeleccionar);
     }
 

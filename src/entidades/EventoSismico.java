@@ -207,7 +207,7 @@ public class EventoSismico {
         cambiosEstado.add(nuevoCambio);
     }
 
-    public Map<String, String> getACO() {
+    public Map<String, String> getACO() { //Alcance, clasificacion, origen
         Map<String, String> datos = new HashMap<>();
         datos.put("alcance", this.alcanceSismo.getNombre());
         datos.put("clasificacion", this.clasificacionSismo.getNombre());
