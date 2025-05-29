@@ -4,8 +4,6 @@ import controlador.ControladorRegistrarRevision;
 import entidades.EventoSismico;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.util.Callback;
 
 public class PantallaRevisionController {
 
@@ -14,20 +12,27 @@ public class PantallaRevisionController {
     @FXML private TableColumn<EventoSismico, String> colEpicentro;
     @FXML private TableColumn<EventoSismico, String> colHipocentro;
     @FXML private TableColumn<EventoSismico, Double> colMagnitud;
-    @FXML private TableColumn<EventoSismico, Boolean> colSeleccionar;
 
     @FXML private TextField txtEventoSeleccionado;
     @FXML private TextField txtAlcance;
     @FXML private TextField txtClasificacion;
     @FXML private TextField txtOrigen;
     @FXML private CheckBox checkMapa;
+    @FXML private Label txtusername;
 
     private EventoSismico eventoSeleccionado;
     private final ControladorRegistrarRevision controladorCU = new ControladorRegistrarRevision();
 
     @FXML
     public void initialize() {
-        controladorCU.cargarEventos(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud, colSeleccionar);
+        controladorCU.registrarResultadoDeRevMan();
+        controladorCU.cargarEventos(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud);
+
+        // Mostrar el username en la interfaz
+        if (txtusername != null && controladorCU.getEmpleadoResponsable() != null) {
+            String usuario = controladorCU.getEmpleadoResponsable().getUsuario().getUsername();
+            txtusername.setText(usuario);
+        }
     }
 
     @FXML
@@ -38,6 +43,9 @@ public class PantallaRevisionController {
             txtAlcance.setText(eventoSeleccionado.getAlcanceSismo().getNombre());
             txtClasificacion.setText(eventoSeleccionado.getClasificacionSismo().getNombre());
             txtOrigen.setText(eventoSeleccionado.getOrigenGeneracion().getNombre());
+
+            // Lógica para bloquear el evento si corresponde
+            // controladorCU.bloquearEvento(eventoSeleccionado);
         }
     }
 
