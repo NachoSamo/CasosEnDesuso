@@ -4,8 +4,6 @@ import controlador.ControladorRegistrarRevision;
 import entidades.EventoSismico;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.util.Callback;
 
 public class PantallaRevisionController {
 
@@ -14,7 +12,6 @@ public class PantallaRevisionController {
     @FXML private TableColumn<EventoSismico, String> colEpicentro;
     @FXML private TableColumn<EventoSismico, String> colHipocentro;
     @FXML private TableColumn<EventoSismico, Double> colMagnitud;
-    @FXML private TableColumn<EventoSismico, Boolean> colSeleccionar;
 
     @FXML private TextField txtEventoSeleccionado;
     @FXML private TextField txtAlcance;
@@ -28,7 +25,7 @@ public class PantallaRevisionController {
     @FXML
     public void initialize() {
         controladorCU.registrarResultadoDeRevMan();
-        controladorCU.cargarEventos(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud, colSeleccionar);
+        controladorCU.cargarEventos(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud);
     }
 
     @FXML

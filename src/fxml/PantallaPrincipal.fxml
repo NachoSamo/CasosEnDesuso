@@ -21,18 +21,17 @@
             <padding>
                 <Insets top="15" right="15" bottom="15" left="15" />
             </padding>
+
             <!-- Tabla de eventos -->
             <Label text="Últimos eventos sísmicos auto-detectados" style="-fx-font-size: 16px;"/>
-            <TableView fx:id="tablaEventos">
+            <TableView fx:id="tablaEventos" onMouseClicked="#confirmarSeleccion">
                 <columns>
                     <TableColumn fx:id="colFechaHora" text="Fecha-Hora ocurrencia" />
                     <TableColumn fx:id="colEpicentro" text="Epicentro" />
                     <TableColumn fx:id="colHipocentro" text="Hipocentro" />
                     <TableColumn fx:id="colMagnitud" text="Magnitud" />
-                    <TableColumn fx:id="colSeleccionar" text="Seleccionar" />
                 </columns>
             </TableView>
-            <Button text="Confirmar selección" onAction="#confirmarSeleccion" />
 
             <!-- Evento seleccionado -->
             <Label text="Evento Sísmico Seleccionado:" />
