@@ -14,14 +14,14 @@ public class Empleado {
         this.mail = mail;
         this.telefono = telefono;
         this.usuario = usuario;
-    }  
+    }
     // Getters y Setters
     public String getNombre() {
         return nombre;
     }
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }   
+    }
     public String getApellido() {
         return apellido;
     }
@@ -46,7 +46,8 @@ public class Empleado {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
-    public Boolean esTuUsuario(Usuario usuario) {
-        return this.usuario.getUsername().equals(usuario.getUsername());// el .username es para acceder al atributo username de Usuario y .getUsername() es para acceder al valor del atributo username
+    public boolean esTuUsuario(String username) {
+        // Compara el username recibido con el username del atributo usuario
+        return this.usuario.getUsername().equals(username);
     }
 }
