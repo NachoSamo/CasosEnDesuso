@@ -9,6 +9,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -53,18 +54,21 @@ public class ControladorRegistrarRevision {
         this.empleadoResponsable = buscarEmpleado();
     }
 
-    private Empleado buscarEmpleado() {
-        Usuario usuarioSesion = obtenerUsuarioSesion();
+    public Empleado buscarEmpleado() {
+        Sesion sesionActual = new Sesion(LocalDateTime.now(), null, new Usuario("jperez", "admin"));
+        Usuario usuarioSesion = sesionActual.getUsuario();
         for (Empleado emp : empleadosSistema) {
-            if (emp.esTuUsuario(usuarioSesion.getUsername())) {
+            if (emp.esTuUsuario(usuarioSesion)) {
                 return emp;
             }
         }
         return null;
     }
 
-    private Usuario obtenerUsuarioSesion() {
-        Sesion sesionActual = new Sesion(null, null, new Usuario("jperez", "admin"));
-        return sesionActual.getUsuario();
+    public  buscarESAutodetectado() {
+        //hay que hacer un atributo que sea una lista de eventos sismicos para poder recorrerla y asi buscar los autodetectados
+        //guardando tambien sus datos, para ordenarlos y retornar la lista con los datos ordenados por fh ocurrencia
+        // Por ahora, retornamos null como placeholder
+        return null;
     }
 }

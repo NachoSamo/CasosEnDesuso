@@ -46,8 +46,8 @@ public class Empleado {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
-    public boolean esTuUsuario(String username) {
-        // Compara el username recibido con el username del atributo usuario
-        return this.usuario.getUsername().equals(username);
+    public boolean esTuUsuario(Usuario usuario) {
+        // Compara el usuario recibido con el objeto del atributo usuario
+        return this.usuario.equals(usuario);
     }
 }
