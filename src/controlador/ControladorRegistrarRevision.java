@@ -63,4 +63,9 @@ public class ControladorRegistrarRevision {
                 .sorted(Comparator.comparing(EventoSismico::getFechaHoraOcurrencia))
                 .toList();
     }
+
+    public Empleado getEmpleadoResponsable() {
+        return this.empleadoResponsable;
+    }
+
 }

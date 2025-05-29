@@ -18,6 +18,7 @@ public class PantallaRevisionController {
     @FXML private TextField txtClasificacion;
     @FXML private TextField txtOrigen;
     @FXML private CheckBox checkMapa;
+    @FXML private Label txtusername;
 
     private EventoSismico eventoSeleccionado;
     private final ControladorRegistrarRevision controladorCU = new ControladorRegistrarRevision();
@@ -26,6 +27,12 @@ public class PantallaRevisionController {
     public void initialize() {
         controladorCU.registrarResultadoDeRevMan();
         controladorCU.cargarEventos(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud);
+
+        // Mostrar el username en la interfaz
+        if (txtusername != null && controladorCU.getEmpleadoResponsable() != null) {
+            String usuario = controladorCU.getEmpleadoResponsable().getUsuario().getUsername();
+            txtusername.setText(usuario);
+        }
     }
 
     @FXML
@@ -36,6 +43,9 @@ public class PantallaRevisionController {
             txtAlcance.setText(eventoSeleccionado.getAlcanceSismo().getNombre());
             txtClasificacion.setText(eventoSeleccionado.getClasificacionSismo().getNombre());
             txtOrigen.setText(eventoSeleccionado.getOrigenGeneracion().getNombre());
+
+            // Lógica para bloquear el evento si corresponde
+            // controladorCU.bloquearEvento(eventoSeleccionado);
         }
     }
 
