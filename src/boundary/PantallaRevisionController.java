@@ -4,6 +4,7 @@ import controlador.ControladorRegistrarRevision;
 import entidades.EventoSismico;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 
 public class PantallaRevisionController {
 
@@ -19,6 +20,7 @@ public class PantallaRevisionController {
     @FXML private TextField txtOrigen;
     @FXML private CheckBox checkMapa;
     @FXML private Label txtusername;
+    @FXML private VBox panelDetalles; // se agrega para poder habilitarlo/deshabilitarlo dinámicamente
 
     private EventoSismico eventoSeleccionado;
     private final ControladorRegistrarRevision controladorCU = new ControladorRegistrarRevision();
@@ -28,10 +30,13 @@ public class PantallaRevisionController {
         controladorCU.registrarResultadoDeRevMan();
         controladorCU.cargarEventos(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud);
 
-        // Mostrar el username en la interfaz
         if (txtusername != null && controladorCU.getEmpleadoResponsable() != null) {
             String usuario = controladorCU.getEmpleadoResponsable().getUsuario().getUsername();
             txtusername.setText(usuario);
+        }
+
+        if (panelDetalles != null) {
+            panelDetalles.setDisable(true);
         }
     }
 
@@ -39,13 +44,14 @@ public class PantallaRevisionController {
     private void confirmarSeleccion() {
         eventoSeleccionado = tablaEventos.getSelectionModel().getSelectedItem();
         if (eventoSeleccionado != null) {
+            tablaEventos.setDisable(true); // bloquea la selección
+            panelDetalles.setDisable(false); // habilita panel de datos
             txtEventoSeleccionado.setText(eventoSeleccionado.toString());
             txtAlcance.setText(eventoSeleccionado.getAlcanceSismo().getNombre());
             txtClasificacion.setText(eventoSeleccionado.getClasificacionSismo().getNombre());
             txtOrigen.setText(eventoSeleccionado.getOrigenGeneracion().getNombre());
 
-            // Lógica para bloquear el evento si corresponde
-            // controladorCU.bloquearEvento(eventoSeleccionado);
+            // controladorCU.bloquearEvento(eventoSeleccionado); // ← descomentá cuando implementes
         }
     }
 

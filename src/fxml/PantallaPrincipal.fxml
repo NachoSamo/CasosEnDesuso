@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.Image?>
-<!--<?import com.gluonhq.charm.glisten.control.Avatar?>-->
 
 <BorderPane xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="boundary.PantallaRevisionController">
@@ -24,15 +23,7 @@
                     <padding>
                         <Insets top="10" right="15" bottom="10" left="10"/>
                     </padding>
-                    <Label fx:id="txtusername" text="username">
-                        <graphic>
-<!--                            <ImageView fitHeight="32" fitWidth="32">-->
-<!--                                <image>-->
-<!--                                    <Image url="@img/avatar.png" />-->
-<!--                                </image>-->
-<!--                            </ImageView>-->
-                        </graphic>
-                    </Label>
+                    <Label fx:id="txtusername" text="username" />
                 </HBox>
             </right>
         </BorderPane>
@@ -44,7 +35,7 @@
                 <Insets top="15" right="15" bottom="15" left="15"/>
             </padding>
 
-            <Label text="Últimos eventos sísmicos auto-detectados" style="-fx-font-size: 16px;"/>
+            <Label text="Últimos eventos sísmicos auto-detectados" style="-fx-font-size: 16px;" />
             <TableView fx:id="tablaEventos" onMouseClicked="#confirmarSeleccion">
                 <columns>
                     <TableColumn fx:id="colFechaHora" text="Fecha-Hora ocurrencia"/>
@@ -54,28 +45,31 @@
                 </columns>
             </TableView>
 
-            <Label text="Evento Sísmico Seleccionado:"/>
-            <TextField fx:id="txtEventoSeleccionado" editable="false"/>
+            <!-- Panel que se activa al seleccionar -->
+            <VBox fx:id="panelDetalles" spacing="10">
+                <Label text="Evento Sísmico Seleccionado:"/>
+                <TextField fx:id="txtEventoSeleccionado" editable="false"/>
 
-            <GridPane hgap="10" vgap="10">
-                <Label text="Parámetro" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <Label text="Valor" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <GridPane hgap="10" vgap="10">
+                    <Label text="Parámetro" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <Label text="Valor" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                <Label text="Alcance (km)" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <TextField fx:id="txtAlcance" GridPane.rowIndex="1" GridPane.columnIndex="1" editable="false"/>
+                    <Label text="Alcance (km)" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="txtAlcance" GridPane.rowIndex="1" GridPane.columnIndex="1" editable="false"/>
 
-                <Label text="Clasificación" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <TextField fx:id="txtClasificacion" GridPane.rowIndex="2" GridPane.columnIndex="1" editable="false"/>
+                    <Label text="Clasificación" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <TextField fx:id="txtClasificacion" GridPane.rowIndex="2" GridPane.columnIndex="1" editable="false"/>
 
-                <Label text="Origen" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <TextField fx:id="txtOrigen" GridPane.rowIndex="3" GridPane.columnIndex="1" editable="false"/>
-            </GridPane>
+                    <Label text="Origen" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <TextField fx:id="txtOrigen" GridPane.rowIndex="3" GridPane.columnIndex="1" editable="false"/>
+                </GridPane>
 
-            <HBox spacing="10">
-                <CheckBox fx:id="checkMapa" text="Mapa Sísmico"/>
-                <Button text="Generar sismograma" onAction="#generarSismograma"/>
-                <Button text="Modificar Datos" onAction="#modificarDatos"/>
-            </HBox>
+                <HBox spacing="10">
+                    <CheckBox fx:id="checkMapa" text="Mapa Sísmico"/>
+                    <Button text="Generar sismograma" onAction="#generarSismograma"/>
+                    <Button text="Modificar Datos" onAction="#modificarDatos"/>
+                </HBox>
+            </VBox>
         </VBox>
     </center>
 
