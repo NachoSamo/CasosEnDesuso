@@ -57,4 +57,11 @@ public class Sismografo {
         this.seriesTemporales = seriesTemporales;
     }
 
+    public Map<SerieTemporal, EstacionSismologica> getSeriesPorEstacion() {
+    Map<SerieTemporal, EstacionSismologica> map = new HashMap<>();
+    for (SerieTemporal st : this.getSeriesTemporales()) {
+        map.put(st, this.getEstacionSismologica());
+    }
+    return map;
+    }
 }

@@ -79,4 +79,6 @@ public class SerieTemporal {
         sb.append("]}");
         return sb.toString();
     }
+
+    
 }

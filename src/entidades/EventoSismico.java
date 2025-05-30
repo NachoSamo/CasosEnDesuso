@@ -215,5 +215,15 @@ public class EventoSismico {
         return datos;
     }
 
-
+    public Map<SerieTemporal, List<String>> getDatosST() {
+        Map<SerieTemporal, List<String>> datosSeries = new HashMap<>();
+        for (SerieTemporal serie : seriesTemporales) {
+            List<String> muestrasInfo = new ArrayList<>();
+            for (MuestraSismica muestra : serie.getMuestrasSismicas()) {
+                muestrasInfo.add(muestra.toString());
+            }
+            datosSeries.put(serie, muestrasInfo);
+        }
+        return datosSeries;
+    }
 }
