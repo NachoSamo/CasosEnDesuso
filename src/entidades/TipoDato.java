@@ -5,7 +5,7 @@ public class TipoDato {
     private String nombreUnidadMedida;
     private double valorUmbral;
 
-    // Constructor
+    // Constructor new()
     public TipoDato(String denominacion, String nombreUnidadMedida, double valorUmbral) {
         this.denominacion = denominacion;
         this.nombreUnidadMedida = nombreUnidadMedida;

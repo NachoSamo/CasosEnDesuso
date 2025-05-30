@@ -26,7 +26,8 @@ public class PantallaRevisionController {
     private final ControladorRegistrarRevision controladorCU = new ControladorRegistrarRevision();
 
     @FXML
-    public void initialize() {
+    public void initialize() {//registrar resultado de revisión manual
+        // Inicializa la pantalla de revisión
         controladorCU.registrarResultadoDeRevMan();
         controladorCU.cargarEventos(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud);
 

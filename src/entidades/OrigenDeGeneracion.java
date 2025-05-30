@@ -4,7 +4,7 @@ public class OrigenDeGeneracion {
     private String nombre;
     private String descripcion;
 
-    // Constructor
+    // Constructor new()
     public OrigenDeGeneracion(String nombre, String descripcion) {
         this.nombre = nombre;
         this.descripcion = descripcion;

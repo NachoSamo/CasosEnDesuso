@@ -5,7 +5,7 @@ public class Estado {
     private String nombreEstado;
     private String ambito;
 
-    //Constructor
+    //Constructor new()
     public Estado(String nombreEstado, String ambito) {
         this.nombreEstado = nombreEstado;
         this.ambito = ambito;

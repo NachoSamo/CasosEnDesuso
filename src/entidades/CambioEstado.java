@@ -7,7 +7,7 @@ public class CambioEstado {
     private LocalDateTime fechaHoraFin;
     private Estado estado;
 
-    // Constructor
+    // Constructor new()
     public CambioEstado(LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin, Estado estado) {
         this.fechaHoraInicio = fechaHoraInicio;
         this.fechaHoraFin = fechaHoraFin;

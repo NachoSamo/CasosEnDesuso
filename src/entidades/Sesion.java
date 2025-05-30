@@ -5,7 +5,7 @@ public class Sesion {
     private LocalDateTime fechaHoraFin;
     private Usuario usuario;
 
-    // Constructor
+    // Constructor new()
     public Sesion(LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin, Usuario usuario) {
         this.fechaHoraInicio = fechaHoraInicio;
         this.fechaHoraFin = fechaHoraFin;

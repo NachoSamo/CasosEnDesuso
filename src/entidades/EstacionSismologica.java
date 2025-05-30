@@ -11,7 +11,7 @@ public class EstacionSismologica {
     private String nombre;
     private int nroCertificacionAdquisicion;
 
-    // Constructor
+    // Constructor new()
     public EstacionSismologica(String codigoEstacion, Boolean documentoCertificacionAdq, LocalDate fechaSolicitudCertificacion, String latitud, String longitud, String nombre, int nroCertificacionAdquisicion) {
         this.codigoEstacion = codigoEstacion;
         this.documentoCertificacionAdq = documentoCertificacionAdq;

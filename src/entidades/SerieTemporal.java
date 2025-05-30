@@ -42,8 +42,12 @@ public class SerieTemporal {
         this.frecuenciaMuestreo = frecuenciaMuestreo;
     }
 
+    public List<MuestraSismica> getMuestrasSismicas() {
+        return muestrasSismicas;
+    }
+
     //Nos interesa este metodo para la secuencia
-    public String getMuestrasSismicas() {
+    public String getDatosMuestrasSismicas() {
         StringBuilder sb = new StringBuilder();
         sb.append("Datos de las muestras de la serie:{");
         for (MuestraSismica muestra : muestrasSismicas) {

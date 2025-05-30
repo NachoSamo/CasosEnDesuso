@@ -4,7 +4,7 @@ public class AlcanceSismo {
     private String nombre;
     private String descripcion;
 
-    // Constructor
+    // Constructor new()
     public AlcanceSismo(String nombre, String descripcion) {
         this.nombre = nombre;
         this.descripcion = descripcion;

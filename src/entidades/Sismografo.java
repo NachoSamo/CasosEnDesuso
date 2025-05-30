@@ -9,7 +9,7 @@ public class Sismografo {
     private EstacionSismologica estacionSismologica;
     private List<SerieTemporal> seriesTemporales;
 
-    // Constructor
+    // Constructor new()
     public Sismografo(LocalDate fechaAdquisicion, int identificadorSismografo, int nroSerie, EstacionSismologica estacionSismologica, List<SerieTemporal> seriesTemporales) {
         this.fechaAdquisicion = fechaAdquisicion;
         this.identificadorSismografo = identificadorSismografo;

@@ -5,7 +5,7 @@ public class ClasificacionSismo {
     private double kmProfundidadDesde;
     private double kmProfundidadHasta;
 
-    // Constructor
+    // Constructor new()
     public ClasificacionSismo(String nombre, double kmProfundidadDesde, double kmProfundidadHasta) {
         this.nombre = nombre;
         this.kmProfundidadDesde = kmProfundidadDesde;

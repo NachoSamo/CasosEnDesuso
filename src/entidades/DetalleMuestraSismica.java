@@ -4,7 +4,7 @@ public class DetalleMuestraSismica {
     private int valor;
     private TipoDato tipoDato;
 
-    // Constructor
+    // Constructor new()
     public DetalleMuestraSismica(int valor, TipoDato tipoDato) {
         this.valor = valor;
         this.tipoDato = tipoDato;

@@ -7,7 +7,7 @@ public class MuestraSismica {
     private LocalDateTime fechaHoraMuestra;
     private List<DetalleMuestraSismica> detallesMuestraSismica;
 
-    // Constructor
+    // Constructor new()
     public MuestraSismica(LocalDateTime fechaHoraMuestra) {
         this.fechaHoraMuestra = fechaHoraMuestra;
         this.detallesMuestraSismica = new ArrayList<>();

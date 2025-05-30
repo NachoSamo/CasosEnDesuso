@@ -7,7 +7,7 @@ public class Empleado {
     private String telefono;
     private Usuario usuario;
 
-    // Constructor
+    // Constructor new()
     public Empleado(String nombre, String apellido, String mail, String telefono, Usuario usuario) {
         this.nombre = nombre;
         this.apellido = apellido;
@@ -47,7 +47,7 @@ public class Empleado {
         this.usuario = usuario;
     }
     public boolean esTuUsuario(Usuario usuario) {
-        // Compara el usuario recibido con el objeto del atributo usuario
+        // Compara el objeto usuario recibido con el objeto del atributo usuario
         return this.usuario.equals(usuario);
     }
 }
