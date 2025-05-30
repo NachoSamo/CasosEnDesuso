@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
@@ -46,30 +46,35 @@
             </TableView>
 
             <!-- Panel que se activa al seleccionar -->
-            <VBox fx:id="panelDetalles" spacing="10">
-                <Label text="Evento Sísmico Seleccionado:"/>
-                <TextField fx:id="txtEventoSeleccionado" editable="false"/>
+            <HBox spacing="20" fx:id="panelDetalles">
+                <VBox spacing="10">
+                    <Label text="Evento Sísmico Seleccionado:"/>
+                    <TextField fx:id="txtEventoSeleccionado" editable="false"/>
 
-                <GridPane hgap="10" vgap="10">
-                    <Label text="Parámetro" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <Label text="Valor" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <GridPane hgap="10" vgap="10">
+                        <Label text="Parámetro" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label text="Valor" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                    <Label text="Alcance (km)" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtAlcance" GridPane.rowIndex="1" GridPane.columnIndex="1" editable="false"/>
+                        <Label text="Alcance (km)" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtAlcance" GridPane.rowIndex="1" GridPane.columnIndex="1" editable="false"/>
 
-                    <Label text="Clasificación" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtClasificacion" GridPane.rowIndex="2" GridPane.columnIndex="1" editable="false"/>
+                        <Label text="Clasificación" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtClasificacion" GridPane.rowIndex="2" GridPane.columnIndex="1" editable="false"/>
 
-                    <Label text="Origen" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtOrigen" GridPane.rowIndex="3" GridPane.columnIndex="1" editable="false"/>
-                </GridPane>
+                        <Label text="Origen" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtOrigen" GridPane.rowIndex="3" GridPane.columnIndex="1" editable="false"/>
+                    </GridPane>
 
-                <HBox spacing="10">
-                    <CheckBox fx:id="checkMapa" text="Mapa Sísmico"/>
-                    <Button text="Generar sismograma" onAction="#generarSismograma"/>
-                    <Button text="Modificar Datos" onAction="#modificarDatos"/>
-                </HBox>
-            </VBox>
+                    <!-- Botones en vez de checkbox -->
+                    <Button fx:id="btnMapa" text="Ver mapa sísmico" onAction="#tomarOptMapaSismico"/>
+                    <Button fx:id="btnModificar" text="Modificar Datos" onAction="#tomarOptModificarDatos"/>
+
+                    <ComboBox fx:id="comboAcciones" promptText="Seleccionar acción"/>
+                    <Button text="Ejecutar acción" onAction="#tomarAccion"/>
+                </VBox>
+
+                <ImageView fx:id="imagenSismograma" fitWidth="500" fitHeight="300" preserveRatio="true" />
+            </HBox>
         </VBox>
     </center>
 
@@ -83,5 +88,4 @@
             <Button fx:id="btnDerivar" text="Derivar a experto" onAction="#derivarEvento"/>
         </HBox>
     </bottom>
-
 </BorderPane>

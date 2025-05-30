@@ -4,7 +4,9 @@ import controlador.ControladorRegistrarRevision;
 import entidades.EventoSismico;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 
 public class PantallaRevisionController {
 
@@ -18,9 +20,13 @@ public class PantallaRevisionController {
     @FXML private TextField txtAlcance;
     @FXML private TextField txtClasificacion;
     @FXML private TextField txtOrigen;
-    @FXML private CheckBox checkMapa;
     @FXML private Label txtusername;
-    @FXML private VBox panelDetalles; // se agrega para poder habilitarlo/deshabilitarlo dinámicamente
+    @FXML private HBox panelDetalles;
+    @FXML private ImageView imagenSismograma;
+
+    @FXML private Button btnMapa;
+    @FXML private Button btnModificar;
+    @FXML private ComboBox<String> comboAcciones;
 
     private EventoSismico eventoSeleccionado;
     private final ControladorRegistrarRevision controladorCU = new ControladorRegistrarRevision();
@@ -35,23 +41,43 @@ public class PantallaRevisionController {
             txtusername.setText(usuario);
         }
 
-        if (panelDetalles != null) {
-            panelDetalles.setDisable(true);
-        }
+        panelDetalles.setDisable(true);
+        comboAcciones.getItems().addAll("Confirmar", "Rechazar", "Derivar");
     }
 
     @FXML
     private void confirmarSeleccion() {
         eventoSeleccionado = tablaEventos.getSelectionModel().getSelectedItem();
         if (eventoSeleccionado != null) {
-            tablaEventos.setDisable(true); // bloquea la selección
-            panelDetalles.setDisable(false); // habilita panel de datos
+            tablaEventos.setDisable(true);
+            panelDetalles.setDisable(false);
+
             txtEventoSeleccionado.setText(eventoSeleccionado.toString());
             txtAlcance.setText(eventoSeleccionado.getAlcanceSismo().getNombre());
             txtClasificacion.setText(eventoSeleccionado.getClasificacionSismo().getNombre());
             txtOrigen.setText(eventoSeleccionado.getOrigenGeneracion().getNombre());
 
-            // controladorCU.bloquearEvento(eventoSeleccionado); // ← descomentá cuando implementes
+            Image sismograma = controladorCU.obtenerImagenSismograma(eventoSeleccionado);
+            if (sismograma != null) imagenSismograma.setImage(sismograma);
+        }
+    }
+
+    @FXML
+    private void tomarOptMapaSismico() {
+        controladorCU.habOptMapa();
+    }
+
+    @FXML
+    private void tomarOptModificarDatos() {
+        controladorCU.habOptModificarDatos();
+        controladorCU.habComboAcciones();
+    }
+
+    @FXML
+    private void tomarAccion() {
+        String accion = comboAcciones.getValue();
+        if (accion != null) {
+            controladorCU.tomarAccion(accion, eventoSeleccionado);
         }
     }
 
@@ -68,11 +94,6 @@ public class PantallaRevisionController {
     @FXML
     private void derivarEvento() {
         controladorCU.derivar(eventoSeleccionado);
-    }
-
-    @FXML
-    private void generarSismograma() {
-        controladorCU.generarSismograma(eventoSeleccionado);
     }
 
     @FXML
