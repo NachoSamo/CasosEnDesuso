@@ -3,14 +3,20 @@ package casosDeUso;
 import entidades.EventoSismico;
 import javafx.scene.image.Image;
 
-/**
- * Stub del caso de uso GenerarSismograma.
- * Actualmente no realiza cálculos, solo devuelve una imagen fija.
- */
 public class GenerarSismograma {
 
     public Image ejecutar(EventoSismico evento) {
-        // Retorna la imagen fija como mock del sismograma
-        return new Image("/img/sismograma.jpg"); // asegurate que esté en src/img/
+        System.out.println("🖼 Ejecutando caso de uso GenerarSismograma para evento: " + evento);
+
+        try {
+            Image img = new Image(getClass().getResource("/img/sismograma.jpg").toExternalForm());
+            System.out.println("✅ Imagen cargada correctamente");
+            return img;
+        } catch (Exception e) {
+            System.out.println("❌ Error cargando imagen del sismograma: " + e.getMessage());
+            return null;
+        }
     }
+
+
 }

@@ -1,6 +1,9 @@
 package entidades;
-import java.util.List;
+
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Sismografo {
     private LocalDate fechaAdquisicion;
@@ -10,13 +13,16 @@ public class Sismografo {
     private List<SerieTemporal> seriesTemporales;
 
     // Constructor
-    public Sismografo(LocalDate fechaAdquisicion, int identificadorSismografo, int nroSerie, EstacionSismologica estacionSismologica, List<SerieTemporal> seriesTemporales) {
+    public Sismografo(LocalDate fechaAdquisicion, int identificadorSismografo, int nroSerie,
+                      EstacionSismologica estacionSismologica, List<SerieTemporal> seriesTemporales) {
         this.fechaAdquisicion = fechaAdquisicion;
         this.identificadorSismografo = identificadorSismografo;
         this.nroSerie = nroSerie;
         this.estacionSismologica = estacionSismologica;
         this.seriesTemporales = seriesTemporales;
-    }   
+    }
+
+    // Getters y Setters
     public LocalDate getFechaAdquisicion() {
         return fechaAdquisicion;
     }
@@ -57,4 +63,15 @@ public class Sismografo {
         this.seriesTemporales = seriesTemporales;
     }
 
+    /**
+     * Devuelve un mapa donde cada SerieTemporal se asocia con su Estación Sismológica.
+     * Es llamado desde el Controlador al ordenar por estación.
+     */
+    public Map<SerieTemporal, EstacionSismologica> getSeriesPorEstacion() {
+        Map<SerieTemporal, EstacionSismologica> map = new HashMap<>();
+        for (SerieTemporal st : this.getSeriesTemporales()) {
+            map.put(st, this.getEstacionSismologica());
+        }
+        return map;
+    }
 }

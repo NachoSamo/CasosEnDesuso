@@ -35,4 +35,7 @@ public class CambioEstado {
     public Boolean sosActual() {
         return fechaHoraFin == null;
     }
+    public void setFechaHoraFin() {
+        this.fechaHoraFin = LocalDateTime.now();
+    }
 }

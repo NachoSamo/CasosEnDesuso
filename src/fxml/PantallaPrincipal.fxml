@@ -65,12 +65,9 @@
                         <TextField fx:id="txtOrigen" GridPane.rowIndex="3" GridPane.columnIndex="1" editable="false"/>
                     </GridPane>
 
-                    <!-- Botones en vez de checkbox -->
+                    <!-- Botones opcionales -->
                     <Button fx:id="btnMapa" text="Ver mapa sísmico" onAction="#tomarOptMapaSismico"/>
                     <Button fx:id="btnModificar" text="Modificar Datos" onAction="#tomarOptModificarDatos"/>
-
-                    <ComboBox fx:id="comboAcciones" promptText="Seleccionar acción"/>
-                    <Button text="Ejecutar acción" onAction="#tomarAccion"/>
                 </VBox>
 
                 <ImageView fx:id="imagenSismograma" fitWidth="500" fitHeight="300" preserveRatio="true" />
@@ -83,9 +80,9 @@
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
-            <Button fx:id="btnRechazar" text="Rechazar" onAction="#rechazarEvento"/>
-            <Button fx:id="btnConfirmar" text="Confirmar" onAction="#confirmarEvento"/>
-            <Button fx:id="btnDerivar" text="Derivar a experto" onAction="#derivarEvento"/>
+            <ComboBox fx:id="comboAcciones" promptText="Seleccionar acción"/>
+            <Button text="Ejecutar" onAction="#ejecutarAccion"/>
+            <Button text="Cancelar" onAction="#cancelarAccion"/>
         </HBox>
     </bottom>
 </BorderPane>
