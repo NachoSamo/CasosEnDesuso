@@ -91,19 +91,23 @@ public class EventoSismico {
     }
 
 
-    public Map<String, Object> getDatos() {
-        Map<String, Object> datos = new HashMap<>();
+    public Map<SerieTemporal, List<String>> getDatosST() {
+        System.out.println("📡 Obteniendo series temporales para el evento: " + this);
+        Map<SerieTemporal, List<String>> datosSeries = new HashMap<>();
 
-        // ✅ Todas estas claves se usan para imprimir en consola, no para la tabla.
-        datos.put("fechaHora", getFechaHoraOcurrencia()); // ← Getter debe existir y no retornar null
-        datos.put("Latitud epicentro", getLatitudEpicentro());
-        datos.put("Latitud hipocentro", getLatitudHipocentro());
-        datos.put("Longitud epicentro", getLongitudEpicentro());
-        datos.put("Longitud hipocentro", getLongitudHipocentro());
-        datos.put("magnitud", getValorMagnitud());
-
-        return datos;
+        for (SerieTemporal serie : seriesTemporales) {
+            List<String> muestrasInfo = new ArrayList<>();
+            for (MuestraSismica muestra : serie.getMuestrasSismicas()) {
+                for (DetalleMuestraSismica detalle : muestra.getDetallesMuestra()) {
+                    muestrasInfo.add(detalle.getDatos());
+                }
+            }
+            datosSeries.put(serie, muestrasInfo);
+        }
+        System.out.println("✅ Datos extraídos de las series: " + datosSeries);
+        return datosSeries;
     }
+
 
 
     public void revisar(Estado nuevoEstado, LocalDateTime fechaCambio) {
@@ -134,22 +138,7 @@ public class EventoSismico {
         return datos;
     }
 
-    // ✅ Corregido: llama a getMuestrasSismicas() de SerieTemporal
-    public Map<SerieTemporal, List<String>> getDatosST() {
-        System.out.println("📡 Obteniendo series temporales para el evento: " + this);
-        Map<SerieTemporal, List<String>> datosSeries = new HashMap<>();
-        for (SerieTemporal serie : seriesTemporales) {
-            List<String> muestrasInfo = new ArrayList<>();
-            for (MuestraSismica muestra : serie.getMuestrasSismicas()) {
-                for (DetalleMuestraSismica detalle : muestra.getDetallesMuestra()) {
-                    muestrasInfo.add(detalle.getDatos());
-                }
-            }
-            datosSeries.put(serie, muestrasInfo);
-        }
-        System.out.println("✅ Datos extraídos de las series: " + datosSeries.size());
-        return datosSeries;
-    }
+
 
     public Map<SerieTemporal, EstacionSismologica> getSeriesPorEstacion() {
         Map<SerieTemporal, EstacionSismologica> resultado = new HashMap<>();

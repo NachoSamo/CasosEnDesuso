@@ -19,6 +19,7 @@ public class MuestraSismica {
     public void setFechaHoraMuestra(LocalDateTime fechaHoraMuestra) {
         this.fechaHoraMuestra = fechaHoraMuestra;
     }
+
     public List<DetalleMuestraSismica> getDetallesMuestra() {
         return detallesMuestraSismica;
     }

@@ -44,6 +44,8 @@ public class PantallaRegistrarResultadoDeRevManual {
         if (txtusername != null && controladorCU.getEmpleadoResponsable() != null) {
             txtusername.setText(controladorCU.getEmpleadoResponsable().getUsuario().getUsername());
         }
+        controladorCU.buscarESAutodetectado(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud);
+
     }
 
 
@@ -56,7 +58,6 @@ public class PantallaRegistrarResultadoDeRevManual {
         colEpicentro.setCellValueFactory(new PropertyValueFactory<>("latitudEpicentro"));
         colHipocentro.setCellValueFactory(new PropertyValueFactory<>("latitudHipocentro"));
         colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
-        controladorCU.buscarESAutodetectado(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud);
     }
 
     @FXML

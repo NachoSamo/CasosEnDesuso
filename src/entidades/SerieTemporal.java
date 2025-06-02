@@ -63,15 +63,12 @@ public class SerieTemporal {
         return muestrasSismicas;
     }
 
-    // ✅ Método para representar en texto los datos de las muestras
-    public String getDatosMuestrasSismicas() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Datos de las muestras de la serie:{");
+    public List<String> getDatosMuestrasSismicas() {
+        List<String> datos = new ArrayList<>();
         for (MuestraSismica muestra : muestrasSismicas) {
-            sb.append(muestra.getDatos()).append(", ");
+            datos.add(muestra.getDatos());
         }
-        sb.append("]}");
-        return sb.toString();
+        return datos;
     }
 
     public void agregarMuestraSismica(MuestraSismica muestra) {
