@@ -7,16 +7,15 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import javafx.scene.Node;
 import javafx.stage.Window;
+import javafx.beans.property.SimpleStringProperty;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class ControladorRegistrarRevision {
+public class ControladorRegistrarResultadoDeRevManual {
 
     private Empleado empleadoResponsable;
     private List<Empleado> empleadosSistema;
@@ -24,25 +23,48 @@ public class ControladorRegistrarRevision {
     private EventoSismico eventoSeleccionado;
     private final GenerarSismograma controladorSismograma = new GenerarSismograma();
 
-    public ControladorRegistrarRevision() {
+    public ControladorRegistrarResultadoDeRevManual() {
         empleadosSistema = MockDatos.obtenerEmpleadosMock();
         eventosSimulados = MockDatos.obtenerEventosMock();
     }
 
-    public void cargarEventos(
+    public void buscarESAutodetectado(
             TableView<EventoSismico> tabla,
             TableColumn<EventoSismico, String> colFechaHora,
             TableColumn<EventoSismico, String> colEpicentro,
             TableColumn<EventoSismico, String> colHipocentro,
             TableColumn<EventoSismico, Double> colMagnitud
     ) {
-        colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrencia"));
-        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("latitudEpicentro"));
-        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("latitudHipocentro"));
-        colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
+        // ⚠️ Asegurarse de que los nombres usados acá coincidan con los getters públicos de EventoSismico.
+        colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrencia")); // getFechaHoraOcurrencia()
+        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("latitudEpicentro"));     // getLatitudEpicentro()
+        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("latitudHipocentro"));   // getLatitudHipocentro()
+        colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));         // getValorMagnitud()
 
-        tabla.setItems(FXCollections.observableArrayList(eventosSimulados));
+        // ✅ Filtrar los eventos cuyo estado sea AutoDetectado o PendienteDeRevision
+        List<EventoSismico> sinRevisar = eventosSimulados.stream()
+                .filter(EventoSismico::soySinRevisar) // ← Verifica que el estado no sea null y que sea "sin revisar"
+                .toList();
+
+        // ✅ Verificación por consola: revisa si realmente se detectaron eventos
+        if (sinRevisar.isEmpty()) {
+            System.out.println("⚠ No se encontraron eventos sin revisar.");
+        } else {
+            System.out.println("✅ Se encontraron " + sinRevisar.size() + " eventos sin revisar.");
+        }
+
+        // ✅ Mostrar los datos de cada evento filtrado
+        sinRevisar.forEach(ev -> {
+            System.out.println("📌 Evento:");
+            ev.getDatos().forEach((clave, valor) -> System.out.println("  • " + clave + ": " + valor));
+        });
+
+        // ✅ Ordenar por fecha y cargar en tabla
+        List<EventoSismico> ordenados = ordenarESPorFechaHoraOcurrencia(sinRevisar);
+        tabla.setItems(FXCollections.observableArrayList(ordenados));
     }
+
+
 
     public void confirmar(EventoSismico ev) {
         System.out.println("Evento confirmado: " + ev);
@@ -102,12 +124,15 @@ public class ControladorRegistrarRevision {
         return null;
     }
 
-    public List<EventoSismico> buscarESAutodetectado() {
-        return eventosSimulados.stream()
-                .filter(ev -> ev.getEstado() != null && ev.getEstado().getNombre().equals("Detectado"))
+
+    public List<EventoSismico> ordenarESPorFechaHoraOcurrencia(List<EventoSismico> eventos) {
+        // ⚠️ Asegúrate que getFechaHoraOcurrencia() no retorne null en ningún evento.
+        return eventos.stream()
                 .sorted(Comparator.comparing(EventoSismico::getFechaHoraOcurrencia))
                 .toList();
     }
+
+
 
     public Empleado getEmpleadoResponsable() {
         return this.empleadoResponsable;
@@ -117,9 +142,6 @@ public class ControladorRegistrarRevision {
         this.eventoSeleccionado = ev;
     }
 
-    public Image obtenerImagenSismograma(EventoSismico ev) {
-        return controladorSismograma.ejecutar(ev);
-    }
 
     private void tomarOptMapaSismico() {
         // Por ahora, solo imprimir para confirmar que funciona

@@ -6,7 +6,7 @@
 <?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="boundary.PantallaRevisionController">
+            fx:controller="boundary.PantallaRegistrarResultadoDeRevManual">
 
     <top>
         <BorderPane prefHeight="66.0" style="-fx-background-color: #d3baba;">
@@ -36,7 +36,7 @@
             </padding>
 
             <Label text="Últimos eventos sísmicos auto-detectados" style="-fx-font-size: 16px;" />
-            <TableView fx:id="tablaEventos" onMouseClicked="#confirmarSeleccion">
+            <TableView fx:id="tablaEventos" onMouseClicked="#tomarSeleccionES">
                 <columns>
                     <TableColumn fx:id="colFechaHora" text="Fecha-Hora ocurrencia"/>
                     <TableColumn fx:id="colEpicentro" text="Epicentro"/>
@@ -81,7 +81,7 @@
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
             <ComboBox fx:id="comboAcciones" promptText="Seleccionar acción"/>
-            <Button text="Ejecutar" onAction="#ejecutarAccion"/>
+            <Button text="Ejecutar" onAction="#tomarAccion"/>
             <Button text="Cancelar" onAction="#cancelarAccion"/>
         </HBox>
     </bottom>

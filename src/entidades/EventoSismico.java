@@ -83,20 +83,28 @@ public class EventoSismico {
     public Empleado getResponsableRevision() { return responsableRevision; }
     public void setResponsableRevision(Empleado responsableRevision) { this.responsableRevision = responsableRevision; }
 
-    public Boolean esPendienteDeRevision() {
-        return this.estado != null && this.estado.soyPendienteDeRevision();
+    public Boolean soySinRevisar() {
+        return this.estado != null && this.estado.soySinRevisar();
     }
+    public String getFechaHoraOcurrenciaTexto() {
+        return this.fechaHoraOcurrencia != null ? this.fechaHoraOcurrencia.toString() : "";
+    }
+
 
     public Map<String, Object> getDatos() {
         Map<String, Object> datos = new HashMap<>();
-        datos.put("fechaHora", getFechaHoraOcurrencia());
+
+        // ✅ Todas estas claves se usan para imprimir en consola, no para la tabla.
+        datos.put("fechaHora", getFechaHoraOcurrencia()); // ← Getter debe existir y no retornar null
         datos.put("Latitud epicentro", getLatitudEpicentro());
         datos.put("Latitud hipocentro", getLatitudHipocentro());
         datos.put("Longitud epicentro", getLongitudEpicentro());
         datos.put("Longitud hipocentro", getLongitudHipocentro());
         datos.put("magnitud", getValorMagnitud());
+
         return datos;
     }
+
 
     public void revisar(Estado nuevoEstado, LocalDateTime fechaCambio) {
         CambioEstado ultimoCambio = buscarCEActual();
