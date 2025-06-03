@@ -1,5 +1,7 @@
 package entidades;
 import java.time.LocalDateTime;
+import java.util.List;
+
 public class Sesion {
     private LocalDateTime fechaHoraInicio;
     private LocalDateTime fechaHoraFin;
@@ -30,5 +32,13 @@ public class Sesion {
     }
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+    public static Sesion obtenerSesionActiva(List<Sesion> sesiones) {
+        for (Sesion sesion : sesiones) {
+            if (sesion.getFechaHoraFin() == null) {
+                return sesion;
+            }
+        }
+        return null;
     }
 }

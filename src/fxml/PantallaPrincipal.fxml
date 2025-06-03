@@ -30,49 +30,56 @@
     </top>
 
     <center>
-        <VBox spacing="15">
-            <padding>
-                <Insets top="15" right="15" bottom="15" left="15"/>
-            </padding>
+        <StackPane fx:id="contenedorCentral">
+            <!-- Vista inicial -->
+            <VBox fx:id="vistaInicial" spacing="20" alignment="CENTER">
+                <Label text="Bienvenido al sistema de revisión manual" style="-fx-font-size: 18px;"/>
+                <Button text="Registrar Resultado" onAction="#iniciarCU"/>
+            </VBox>
 
-            <Label text="Últimos eventos sísmicos auto-detectados" style="-fx-font-size: 16px;" />
-            <TableView fx:id="tablaEventos" onMouseClicked="#tomarSeleccionES">
-                <columns>
-                    <TableColumn fx:id="colFechaHora" text="Fecha-Hora ocurrencia"/>
-                    <TableColumn fx:id="colEpicentro" text="Epicentro"/>
-                    <TableColumn fx:id="colHipocentro" text="Hipocentro"/>
-                    <TableColumn fx:id="colMagnitud" text="Magnitud"/>
-                </columns>
-            </TableView>
+            <!-- Vista del caso de uso -->
+            <VBox fx:id="vistaCU" spacing="15" visible="false" managed="false">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
 
-            <!-- Panel que se activa al seleccionar -->
-            <HBox spacing="20" fx:id="panelDetalles">
-                <VBox spacing="10">
-                    <Label text="Evento Sísmico Seleccionado:"/>
-                    <TextField fx:id="txtEventoSeleccionado" editable="false"/>
+                <Label text="Últimos eventos sísmicos auto-detectados" style="-fx-font-size: 16px;" />
+                <TableView fx:id="tablaEventos" onMouseClicked="#tomarSeleccionES">
+                    <columns>
+                        <TableColumn fx:id="colFechaHora" text="Fecha-Hora ocurrencia"/>
+                        <TableColumn fx:id="colEpicentro" text="Epicentro"/>
+                        <TableColumn fx:id="colHipocentro" text="Hipocentro"/>
+                        <TableColumn fx:id="colMagnitud" text="Magnitud"/>
+                    </columns>
+                </TableView>
 
-                    <GridPane hgap="10" vgap="10">
-                        <Label text="Parámetro" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                        <Label text="Valor" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <HBox spacing="20" fx:id="panelDetalles">
+                    <VBox spacing="10">
+                        <Label text="Evento Sísmico Seleccionado:"/>
+                        <TextField fx:id="txtEventoSeleccionado" editable="false"/>
 
-                        <Label text="Alcance (km)" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <TextField fx:id="txtAlcance" GridPane.rowIndex="1" GridPane.columnIndex="1" editable="false"/>
+                        <GridPane hgap="10" vgap="10">
+                            <Label text="Parámetro" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <Label text="Valor" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                        <Label text="Clasificación" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                        <TextField fx:id="txtClasificacion" GridPane.rowIndex="2" GridPane.columnIndex="1" editable="false"/>
+                            <Label text="Alcance (km)" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <TextField fx:id="txtAlcance" GridPane.rowIndex="1" GridPane.columnIndex="1" editable="false"/>
 
-                        <Label text="Origen" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                        <TextField fx:id="txtOrigen" GridPane.rowIndex="3" GridPane.columnIndex="1" editable="false"/>
-                    </GridPane>
+                            <Label text="Clasificación" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <TextField fx:id="txtClasificacion" GridPane.rowIndex="2" GridPane.columnIndex="1" editable="false"/>
 
-                    <!-- Botones opcionales -->
-                    <Button fx:id="btnMapa" text="Ver mapa sísmico" onAction="#tomarOptMapaSismico"/>
-                    <Button fx:id="btnModificar" text="Modificar Datos" onAction="#tomarOptModificarDatos"/>
-                </VBox>
+                            <Label text="Origen" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                            <TextField fx:id="txtOrigen" GridPane.rowIndex="3" GridPane.columnIndex="1" editable="false"/>
+                        </GridPane>
 
-                <ImageView fx:id="imagenSismograma" fitWidth="500" fitHeight="300" preserveRatio="true" />
-            </HBox>
-        </VBox>
+                        <Button fx:id="btnMapa" text="Ver mapa sísmico" onAction="#tomarOptMapaSismico"/>
+                        <Button fx:id="btnModificar" text="Modificar Datos" onAction="#tomarOptModificarDatos"/>
+                    </VBox>
+
+                    <ImageView fx:id="imagenSismograma" fitWidth="500" fitHeight="300" preserveRatio="true" />
+                </HBox>
+            </VBox>
+        </StackPane>
     </center>
 
     <bottom>

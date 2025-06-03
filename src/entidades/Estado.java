@@ -37,6 +37,7 @@ public class Estado {
         return "AutoDetectado".equals(this.nombreEstado);
     }
 
+    // chequea segun maquina de estados
     public boolean soySinRevisar() {
         return this.soyPendienteDeRevision() || this.soyAutoDetectado();
     }

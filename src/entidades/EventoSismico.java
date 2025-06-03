@@ -92,17 +92,24 @@ public class EventoSismico {
 
     public Map<String, Object> getDatos() {
         Map<String, Object> datos = new HashMap<>();
-        datos.put("fechaHora", getFechaHoraOcurrencia());
-        datos.put("coordEpicentro", getLatitudEpicentro());
-        datos.put("coordHipocentro", getLatitudHipocentro());
-        datos.put("magnitud", getValorMagnitud());
+        datos.put("fechaHora: ", getFechaHoraOcurrencia());
+        datos.put("coordEpicentro: ", getCoordEpicentro());
+        datos.put("coordHipocentro: ", getCoordHipocentro());
+        datos.put("magnitud: ", getValorMagnitud());
         return datos;
+    }
+
+    public String getCoordEpicentro() {
+        return getLatitudEpicentro() + getLongitudEpicentro();
+    }
+
+    public String getCoordHipocentro() {
+        return getLatitudHipocentro() + getLongitudHipocentro();
     }
 
 
 
-
-    public Map<SerieTemporal, List<String>> getDatosST() {
+    public Map<SerieTemporal, List<String>> getDatosMuestrasSismicas() {
         System.out.println("📡 Obteniendo series temporales para el evento: " + this);
         Map<SerieTemporal, List<String>> datosSeries = new HashMap<>();
 

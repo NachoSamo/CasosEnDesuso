@@ -2,11 +2,15 @@ package boundary;
 
 import controlador.ControladorRegistrarResultadoDeRevManual;
 import entidades.EventoSismico;
+import entidades.MockDatos;
+import entidades.Sesion;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -20,7 +24,9 @@ public class PantallaRegistrarResultadoDeRevManual {
     @FXML private TableColumn<EventoSismico, String> colEpicentro;
     @FXML private TableColumn<EventoSismico, String> colHipocentro;
     @FXML private TableColumn<EventoSismico, Double> colMagnitud;
-
+    @FXML private StackPane contenedorCentral;
+    @FXML private VBox vistaInicial;
+    @FXML private VBox vistaCU;
     @FXML private TextField txtEventoSeleccionado;
     @FXML private TextField txtAlcance;
     @FXML private TextField txtClasificacion;
@@ -30,44 +36,72 @@ public class PantallaRegistrarResultadoDeRevManual {
     @FXML private Button btnEjecutar;
     @FXML private Button btnCancelar;
     @FXML private ImageView imagenSismograma;
+    private Sesion sesionActiva;
+
 
     private EventoSismico eventoSeleccionado;
     private final ControladorRegistrarResultadoDeRevManual controladorCU = new ControladorRegistrarResultadoDeRevManual();
 
+    public void setSesion(Sesion sesion) {
+        this.sesionActiva = sesion;
+    }
+
+    @FXML
+    private void iniciarCU() {
+        vistaInicial.setVisible(false);
+        vistaInicial.setManaged(false);
+
+        vistaCU.setVisible(true);
+        vistaCU.setManaged(true);
+        initialize();
+    }
+
+
     @FXML
     public void initialize() {
-        habilitarPantalla();
+        // Obtener sesiones mockeadas
+        List<Sesion> sesiones = MockDatos.obtenerSesionesMock();
+        // Buscar la sesión activa
+        Sesion sesionActiva = Sesion.obtenerSesionActiva(sesiones);
+        controladorCU.setBoundary(this); // 👈 le paso el boundary al controlador
+        controladorCU.registrarResultadoDeRevMan(sesionActiva); // él llama a mostrarES(
+        habilitarPantalla(sesionActiva);
+
     }
+
+
+
 
     // paso 1: habilitar ventana
     @FXML
-    public void habilitarPantalla() {
+    public void habilitarPantalla(Sesion sesionActiva) {
         colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrenciaTexto"));
-        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("latitudEpicentro"));
-        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("latitudHipocentro"));
+        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("coordEpicentro"));
+        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("coordHipocentro"));
         colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
 
 
-        List<EventoSismico> eventos = controladorCU.registrarResultadoDeRevMan();
+        List<EventoSismico> eventos = controladorCU.registrarResultadoDeRevMan(sesionActiva);
         // 3. LLAMO A mostrarES
-        mostrarES(eventos);
         habComboAcciones();
-        if (txtusername != null && controladorCU.getEmpleadoResponsable() != null) {
-            txtusername.setText(controladorCU.getEmpleadoResponsable().getUsuario().getUsername());
+        if (txtusername != null && controladorCU.buscarEmpleado(sesionActiva) != null) {
+            txtusername.setText(controladorCU.buscarEmpleado(sesionActiva).getUsuario().getUsername());
         }
     }
+
+
 
 
     private void habComboAcciones() {
         comboAcciones.getItems().addAll("Confirmar", "Rechazar", "Derivar a experto");
     }
 
-    private void mostrarES(List<EventoSismico> eventos) {
+    public void mostrarES(List<EventoSismico> eventos) {
         tablaEventos.setItems(FXCollections.observableArrayList(eventos));
     }
 
     @FXML
-    private void solicitarSeleccionES() {
+    public void solicitarSeleccionES() {
         eventoSeleccionado = tablaEventos.getSelectionModel().getSelectedItem();
         if (eventoSeleccionado != null) {
             tomarSeleccionES();

@@ -1,10 +1,9 @@
 package controlador;
 
+import boundary.PantallaRegistrarResultadoDeRevManual;
 import casosDeUso.GenerarSismograma;
 import entidades.*;
-import javafx.collections.FXCollections;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -19,33 +18,56 @@ public class ControladorRegistrarResultadoDeRevManual {
     private List<EventoSismico> eventosSimulados;
     private EventoSismico eventoSeleccionado;
     private final GenerarSismograma controladorSismograma = new GenerarSismograma();
+    private PantallaRegistrarResultadoDeRevManual boundaryRef;
+    private List<Estado> estadosDisponibles;
+
+    public void setBoundary(PantallaRegistrarResultadoDeRevManual boundary) {
+        this.boundaryRef = boundary;
+    }
+
 
     public ControladorRegistrarResultadoDeRevManual() {
+        estadosDisponibles = MockDatos.obtenerEstadosMock();
         empleadosSistema = MockDatos.obtenerEmpleadosMock();
         eventosSimulados = MockDatos.obtenerEventosMock();
     }
 
+
+
+
     // ✅ Paso inicial del caso de uso
-    public List<EventoSismico> registrarResultadoDeRevMan() {
-        this.empleadoResponsable = buscarEmpleado();
+    public List<EventoSismico> registrarResultadoDeRevMan(Sesion sesionActiva) {
+        this.empleadoResponsable = buscarEmpleado(sesionActiva);
         List<EventoSismico> eventos = buscarESSinRevisar(); // Buscar sin ordenar
-        return ordenarESPorFechaHoraOcurrencia(eventos); // Devuelvo lista de eventos
+        List<EventoSismico> ordenados = ordenarESPorFechaHoraOcurrencia(eventos); // Devuelvo lista de eventos
+        //        return pantallaRegistrarResultadoDeRevManual.mostrarESeventosOrdenados();
+
+        if (boundaryRef != null) {
+            boundaryRef.mostrarES(ordenados);
+            boundaryRef.solicitarSeleccionES();
+        }
+        return ordenados;
     }
 
-    public Empleado buscarEmpleado() {
-        Usuario usuarioActual = empleadosSistema.get(0).getUsuario(); // Simulación de usuario actual
-        Sesion sesionActual = new Sesion(LocalDateTime.now(), null, usuarioActual);
-        Usuario usuarioSesion = sesionActual.getUsuario();
+    public Empleado buscarEmpleado(Sesion sesionActiva) {
+        if (sesionActiva == null) {
+            System.out.println("⚠ Sesión activa no recibida.");
+            return null;
+        }
+
+        Usuario usuarioSesion = sesionActiva.getUsuario();
+        System.out.println("🔍 Buscando empleado para usuario: " + usuarioSesion.getUsername());
+
         for (Empleado emp : empleadosSistema) {
+            System.out.println("🔁 Comparando con: " + emp.getUsuario().getUsername());
             if (emp.esTuUsuario(usuarioSesion)) {
+                System.out.println("✅ Empleado encontrado: " + emp.getNombre());
                 return emp;
             }
         }
-        return null;
-    }
 
-    public Empleado getEmpleadoResponsable() {
-        return this.empleadoResponsable;
+        System.out.println("❌ Empleado no encontrado.");
+        return null;
     }
 
     public List<EventoSismico> buscarESSinRevisar() {
@@ -67,45 +89,51 @@ public class ControladorRegistrarResultadoDeRevManual {
     // ✅ Tomar evento seleccionado desde la pantalla
     public void tomarSeleccionES(EventoSismico evento) {
         this.eventoSeleccionado = evento;
+        Estado estadoEnRevision = buscarESEnRevisión();
+        LocalDateTime fechaActual = getFechaHoraActual();
+        revisar(evento, estadoEnRevision, fechaActual);
+        Map<String, String> detalles = buscarDetallesES();
     }
 
-    // ✅ Buscar estado "En Revisión" en la lista de estados
-    public Estado buscarEstadoEnRevision(EventoSismico ev) {
-        for (CambioEstado ce : ev.getCambiosEstado()) {
-            Estado estado = ce.getEstado();
-            if (estado.esAmbitoEvento() && estado.esEnRevision()) {
+    public Estado buscarESEnRevisión() {
+        for (Estado estado : estadosDisponibles) {
+            if (estado != null
+                    && estado.esEnRevision()
+                    && estado.esAmbitoEvento()) {
                 return estado;
             }
         }
-        return null;
+        return null; // Si no lo encuentra
     }
 
-    // ✅ Buscar estado "Rechazado"
-    public Estado buscarRechazado(List<Estado> estados) {
-        for (Estado estado : estados) {
-            if (estado.esAmbitoEvento() && estado.esRechazado()) {
-                return estado;
-            }
+
+    public LocalDateTime getFechaHoraActual() {
+        return LocalDateTime.now();
+    }
+
+    public void revisar(EventoSismico ev, Estado estadoEnRevision, LocalDateTime fechaActual) {
+        if (estadoEnRevision != null && ev != null) {
+            ev.revisar(estadoEnRevision, fechaActual);
         }
-        return null;
     }
 
-    // ✅ Ejecuta revisión del evento
-    public void revisar(EventoSismico ev, Estado nuevoEstado) {
-        ev.revisar(nuevoEstado, LocalDateTime.now());
-    }
 
     // ✅ Obtener estructura ACO (alcance, clasificación, origen)
     public Map<String, String> buscarDetallesES() {
         if (eventoSeleccionado == null) return Collections.emptyMap();
-        return eventoSeleccionado.getACO();
+        Map<String, String> aco = eventoSeleccionado.getACO();
+        Map<SerieTemporal, List<String>> datosMuestrasSismicas = eventoSeleccionado.getDatosMuestrasSismicas();
+        ordenarPorEstacionSismologica()
+        geneararSismograma()
     }
+
+
 
     // ✅ Generar imagen sismograma con detalle de estaciones
     public Image generarSismograma(EventoSismico evento) {
         if (evento == null) return null;
 
-        Map<SerieTemporal, List<String>> datosMuestras = evento.getDatosST();
+        Map<SerieTemporal, List<String>> datosMuestras = evento.getDatosMuestrasSismicas();
         Map<SerieTemporal, EstacionSismologica> estaciones = evento.getSeriesPorEstacion();
 
         System.out.println("📊 Detalles de muestras por estación:");
@@ -138,6 +166,20 @@ public class ControladorRegistrarResultadoDeRevManual {
         System.out.println("↩ Evento restaurado a estado AutoDetectado.");
     }
 
+    // ✅ Buscar estado "Rechazado"
+    public Estado buscarRechazado(List<Estado> estados) {
+        for (Estado estado : estados) {
+            if (estado.esAmbitoEvento() && estado.esRechazado()) {
+                return estado;
+            }
+        }
+        return null;
+    }
+
+
+
+
+
     public void finCU(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Finalización de Caso de Uso");
@@ -151,5 +193,7 @@ public class ControladorRegistrarResultadoDeRevManual {
                 .orElse(null);
         if (stage != null) stage.close();
     }
+
+
 
 }
