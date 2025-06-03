@@ -68,6 +68,8 @@ public class MockDatos {
     }
 
 
+
+
     public static List<Estado> obtenerEstadosMock() {
         return FXCollections.observableArrayList(
                 new Estado("AutoDetectado", "Evento"),

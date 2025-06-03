@@ -83,13 +83,16 @@
     </center>
 
     <bottom>
-        <HBox spacing="15" alignment="CENTER">
+        <HBox fx:id="seccionBottom" spacing="15" alignment="CENTER" visible="false" managed="false">
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
-            <ComboBox fx:id="comboAcciones" promptText="Seleccionar acción"/>
-            <Button text="Ejecutar" onAction="#tomarAccion"/>
-            <Button text="Cancelar" onAction="#cancelarAccion"/>
+
+            <!-- Botones separados en lugar de ComboBox -->
+            <Button fx:id="btnConfirmar" text="Confirmar" onAction="#confirmarEvento"/>
+            <Button fx:id="btnRechazar" text="Rechazar" onAction="#rechazarEvento"/>
+            <Button fx:id="btnDerivar" text="Derivar a experto" onAction="#derivarEvento"/>
+            <Button fx:id="btnCancelar" text="Cancelar" onAction="#cancelarAccion"/>
         </HBox>
     </bottom>
 </BorderPane>

@@ -114,12 +114,7 @@ public class EventoSismico {
         Map<SerieTemporal, List<String>> datosSeries = new HashMap<>();
 
         for (SerieTemporal serie : seriesTemporales) {
-            List<String> muestrasInfo = new ArrayList<>();
-            for (MuestraSismica muestra : serie.getMuestrasSismicas()) {
-                for (DetalleMuestraSismica detalle : muestra.getDetallesMuestra()) {
-                    muestrasInfo.add(detalle.getDatos());
-                }
-            }
+            List<String> muestrasInfo = Collections.singletonList(serie.getDatosMuestrasSismicas());
             datosSeries.put(serie, muestrasInfo);
         }
         System.out.println("✅ Datos extraídos de las series: " + datosSeries);
