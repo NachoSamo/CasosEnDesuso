@@ -41,32 +41,48 @@ public class ControladorRegistrarResultadoDeRevManual {
         return null;
     }
 
-    public Empleado getEmpleadoResponsable() {
+    public Empleado getEmpleadoLogead() {
         return this.empleadoResponsable;
     }
 
     // ✅ Mostrar ES sin revisar en la tabla
-    public void buscarESAutodetectado(
+    public void buscarESSinRevisar(
             TableView<EventoSismico> tabla,
             TableColumn<EventoSismico, String> colFechaHora,
             TableColumn<EventoSismico, String> colEpicentro,
             TableColumn<EventoSismico, String> colHipocentro,
             TableColumn<EventoSismico, Double> colMagnitud
     ) {
+        // Asociar las columnas con los atributos del modelo
         colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrenciaTexto"));
         colEpicentro.setCellValueFactory(new PropertyValueFactory<>("latitudEpicentro"));
         colHipocentro.setCellValueFactory(new PropertyValueFactory<>("latitudHipocentro"));
         colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
 
+        // Filtrar los eventos que aún no fueron revisados
         List<EventoSismico> sinRevisar = eventosSimulados.stream()
                 .filter(EventoSismico::soySinRevisar)
                 .toList();
 
-        sinRevisar.forEach(ev -> ev.getDatosST()); // Forzar ejecución del getDatos
+        // Debug por consola y ejecución de getDatos()
+        if (sinRevisar.isEmpty()) {
+            System.out.println("⚠ No se encontraron eventos sin revisar.");
+        } else {
+            System.out.println("✅ Se encontraron " + sinRevisar.size() + " eventos sin revisar:");
+            for (EventoSismico ev : sinRevisar) {
+                Map<String, Object> datos = ev.getDatos();  // ← llamado explícito
+                System.out.println("📌 Evento:");
+                datos.forEach((k, v) -> System.out.println("  • " + k + ": " + v));
+            }
+        }
 
+        // Ordenar los eventos por fecha-hora de ocurrencia
         List<EventoSismico> ordenados = ordenarESPorFechaHoraOcurrencia(sinRevisar);
+
+        // Cargar los eventos ordenados en la tabla
         tabla.setItems(FXCollections.observableArrayList(ordenados));
     }
+
 
     public List<EventoSismico> ordenarESPorFechaHoraOcurrencia(List<EventoSismico> eventos) {
         return eventos.stream()

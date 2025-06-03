@@ -36,16 +36,15 @@ public class PantallaRegistrarResultadoDeRevManual {
         habilitarPantalla();
     }
 
-
+    // paso 1: habilitar ventana
     @FXML
     public void habilitarPantalla() {
         controladorCU.registrarResultadoDeRevMan(); // Se le pasa la pantalla como referencia
-        habComboAcciones();
         if (txtusername != null && controladorCU.getEmpleadoResponsable() != null) {
             txtusername.setText(controladorCU.getEmpleadoResponsable().getUsuario().getUsername());
         }
-        controladorCU.buscarESAutodetectado(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud);
-
+        controladorCU.buscarESSinRevisar(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud);
+        habComboAcciones();
     }
 
 

@@ -90,6 +90,17 @@ public class EventoSismico {
         return this.fechaHoraOcurrencia != null ? this.fechaHoraOcurrencia.toString() : "";
     }
 
+    public Map<String, Object> getDatos() {
+        Map<String, Object> datos = new HashMap<>();
+        datos.put("fechaHora", getFechaHoraOcurrencia());
+        datos.put("coordEpicentro", getLatitudEpicentro());
+        datos.put("coordHipocentro", getLatitudHipocentro());
+        datos.put("magnitud", getValorMagnitud());
+        return datos;
+    }
+
+
+
 
     public Map<SerieTemporal, List<String>> getDatosST() {
         System.out.println("📡 Obteniendo series temporales para el evento: " + this);
@@ -119,6 +130,7 @@ public class EventoSismico {
         setEstado(nuevoEstado);
     }
 
+
     public CambioEstado buscarCEActual() {
         if (cambiosEstado.isEmpty()) return null;
         CambioEstado ultimoCambio = cambiosEstado.get(cambiosEstado.size() - 1);
@@ -126,7 +138,7 @@ public class EventoSismico {
     }
 
     public void crearNuevoCE(LocalDateTime fechaCambio, LocalDateTime fechaFin, Estado estado) {
-        CambioEstado nuevoCambio = new CambioEstado(fechaCambio, fechaFin, estado);
+         CambioEstado nuevoCambio = new CambioEstado(fechaCambio, fechaFin, estado);
         cambiosEstado.add(nuevoCambio);
     }
 
