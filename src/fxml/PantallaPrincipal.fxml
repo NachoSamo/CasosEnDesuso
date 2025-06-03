@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="boundary.PantallaRevisionController">
+            fx:controller="boundary.PantallaRegistrarResultadoDeRevManual">
 
     <top>
         <BorderPane prefHeight="66.0" style="-fx-background-color: #d3baba;">
@@ -36,7 +36,7 @@
             </padding>
 
             <Label text="Últimos eventos sísmicos auto-detectados" style="-fx-font-size: 16px;" />
-            <TableView fx:id="tablaEventos" onMouseClicked="#confirmarSeleccion">
+            <TableView fx:id="tablaEventos" onMouseClicked="#tomarSeleccionES">
                 <columns>
                     <TableColumn fx:id="colFechaHora" text="Fecha-Hora ocurrencia"/>
                     <TableColumn fx:id="colEpicentro" text="Epicentro"/>
@@ -46,30 +46,32 @@
             </TableView>
 
             <!-- Panel que se activa al seleccionar -->
-            <VBox fx:id="panelDetalles" spacing="10">
-                <Label text="Evento Sísmico Seleccionado:"/>
-                <TextField fx:id="txtEventoSeleccionado" editable="false"/>
+            <HBox spacing="20" fx:id="panelDetalles">
+                <VBox spacing="10">
+                    <Label text="Evento Sísmico Seleccionado:"/>
+                    <TextField fx:id="txtEventoSeleccionado" editable="false"/>
 
-                <GridPane hgap="10" vgap="10">
-                    <Label text="Parámetro" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <Label text="Valor" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <GridPane hgap="10" vgap="10">
+                        <Label text="Parámetro" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label text="Valor" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                    <Label text="Alcance (km)" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtAlcance" GridPane.rowIndex="1" GridPane.columnIndex="1" editable="false"/>
+                        <Label text="Alcance (km)" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtAlcance" GridPane.rowIndex="1" GridPane.columnIndex="1" editable="false"/>
 
-                    <Label text="Clasificación" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtClasificacion" GridPane.rowIndex="2" GridPane.columnIndex="1" editable="false"/>
+                        <Label text="Clasificación" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtClasificacion" GridPane.rowIndex="2" GridPane.columnIndex="1" editable="false"/>
 
-                    <Label text="Origen" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtOrigen" GridPane.rowIndex="3" GridPane.columnIndex="1" editable="false"/>
-                </GridPane>
+                        <Label text="Origen" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtOrigen" GridPane.rowIndex="3" GridPane.columnIndex="1" editable="false"/>
+                    </GridPane>
 
-                <HBox spacing="10">
-                    <CheckBox fx:id="checkMapa" text="Mapa Sísmico"/>
-                    <Button text="Generar sismograma" onAction="#generarSismograma"/>
-                    <Button text="Modificar Datos" onAction="#modificarDatos"/>
-                </HBox>
-            </VBox>
+                    <!-- Botones opcionales -->
+                    <Button fx:id="btnMapa" text="Ver mapa sísmico" onAction="#tomarOptMapaSismico"/>
+                    <Button fx:id="btnModificar" text="Modificar Datos" onAction="#tomarOptModificarDatos"/>
+                </VBox>
+
+                <ImageView fx:id="imagenSismograma" fitWidth="500" fitHeight="300" preserveRatio="true" />
+            </HBox>
         </VBox>
     </center>
 
@@ -78,10 +80,9 @@
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
-            <Button fx:id="btnRechazar" text="Rechazar" onAction="#rechazarEvento"/>
-            <Button fx:id="btnConfirmar" text="Confirmar" onAction="#confirmarEvento"/>
-            <Button fx:id="btnDerivar" text="Derivar a experto" onAction="#derivarEvento"/>
+            <ComboBox fx:id="comboAcciones" promptText="Seleccionar acción"/>
+            <Button text="Ejecutar" onAction="#tomarAccion"/>
+            <Button text="Cancelar" onAction="#cancelarAccion"/>
         </HBox>
     </bottom>
-
 </BorderPane>
