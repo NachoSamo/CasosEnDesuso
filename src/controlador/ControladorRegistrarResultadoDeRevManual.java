@@ -91,7 +91,7 @@ public class ControladorRegistrarResultadoDeRevManual {
         Estado estadoEnRevision = buscarESEnRevisión();
         LocalDateTime fechaActual = getFechaHoraActual();
         revisar(evento, estadoEnRevision, fechaActual);
-//        Map<String, String> detalles = buscarDetallesES();
+        Map<String, String> detalles = buscarDetallesES();
     }
 
     public Estado buscarESEnRevisión() {
@@ -117,44 +117,16 @@ public class ControladorRegistrarResultadoDeRevManual {
     }
 
 
-    // ✅ Obtener estructura ACO (alcance, clasificación, origen)
-//    public Map<String, String> buscarDetallesES() {
-//        if (eventoSeleccionado == null) return Collections.emptyMap();
-//        Map<String, String> aco = eventoSeleccionado.getACO();
-//        System.out.println("✅ ACO del evento:");
-//        aco.forEach((k, v) -> System.out.println(" • " + k + ": " + v));
-//        Map<SerieTemporal, List<String>> datosMuestrasSismicasXSerie = eventoSeleccionado.getDatosMuestrasSismicas();
-//
-//
-//
-//        // Acumular seriesXEstacion desde todos los sismógrafos
-//        Map<SerieTemporal, EstacionSismologica> seriesXEstacion = new HashMap<>();
-//        for (Sismografo sis : eventoSeleccionado.getSismografos()) {
-//            seriesXEstacion.putAll(sis.getSeriesPorEstacion());
-//        }
-//
-//        Map<String, List<String>> datosAgrupados = ordenarPorEstacionSismologica(datosMuestrasSismicasXSerie, seriesXEstacion);
-//
-//        System.out.println("📊 Muestras agrupadas por estación:");
-//        datosAgrupados.forEach((estacion, muestras) -> {
-//            System.out.println("🛰 Estación: " + estacion);
-//            muestras.forEach(m -> System.out.println("   - " + m));
-//        });
-//
-//
-//        // 5. Mostrar en consola para debug
-//        System.out.println("📊 Muestras agrupadas por estación:");
-//        ordenarPorEstacionSismologica.forEach((estacion, muestras) -> {
-//            System.out.println("🛰 Estación: " + estacion);
-//            muestras.forEach(detalle -> System.out.println("   - " + detalle));
-//        });
-//        Image sismograma = generarSismograma(eventoSeleccionado);
-//        if (sismograma != null) {
-//            System.out.println("🖼 Imagen del sismograma generada correctamente.");
-//        } else {
-//            System.out.println("⚠ No se pudo generar el sismograma.");
-//        }
-//    }
+    public Map<String, String> buscarDetallesES() {
+        if (eventoSeleccionado == null) return Collections.emptyMap();
+        Map<String, String> aco = eventoSeleccionado.getACO();
+        Map<SerieTemporal, List<String>> datosMuestrasSismicas = eventoSeleccionado.getDatosMuestrasSismicas();
+//        ordenarPorEstacionSismologica()
+//        geneararSismograma()
+        return boundaryRef.mostrarDetalleES(aco);
+    }
+
+
 
     // ✅ Combinar serie ↔ estación ↔ detalles
     public Map<String, List<String>> ordenarPorEstacionSismologica(
@@ -200,6 +172,36 @@ public class ControladorRegistrarResultadoDeRevManual {
 
 
 
+
+
+
+    public void tomarAccion(String accion) {
+        EventoSismico evento = this.eventoSeleccionado;
+        if (evento == null || accion == null) return;
+
+        evento.validarExistencias(this.eventoSeleccionado);
+
+        LocalDateTime fechaActual = this.getFechaHoraActual();
+
+        switch (accion.toLowerCase()) {
+            case "confirmar" -> {
+                Estado estadoConfirmado = buscarConfirmado(estadosDisponibles);
+                confirmar(estadoConfirmado, fechaActual);
+            }
+            case "rechazar" -> {
+                Estado estadoRechazado = buscarRechazado(estadosDisponibles);
+                rechazar(estadoRechazado, fechaActual);
+                
+            }
+            case "derivar" -> {
+                Estado estadoDerivado = buscarDerivado(estadosDisponibles);
+                derivar(estadoDerivado, fechaActual);
+            }
+            default -> System.out.println("⚠ Acción no reconocida: " + accion);
+        }
+    }
+
+
     // ✅ Buscar estado "Rechazado"
     public Estado buscarRechazado(List<Estado> estados) {
         for (Estado estado : estados) {
@@ -211,53 +213,53 @@ public class ControladorRegistrarResultadoDeRevManual {
     }
 
 
-    public void confirmar(EventoSismico ev) {
-        Estado estadoConfirmado = estadosDisponibles.stream()
-                .filter(e -> e.getNombre().equals("Confirmado") && e.getAmbito().equals("Revisión manual"))
-                .findFirst()
-                .orElse(new Estado("Confirmado", "Revisión manual"));
+    public Estado buscarConfirmado(List<Estado> estados) {
+        for (Estado estado : estados) {
+            if ("Confirmado".equals(estado.getNombre()) && "Evento".equals(estado.getAmbito())) {
+                return estado;
+            }
+        }
+        return new Estado("Confirmado", "Evento"); // Fallback
+    }
 
-        cerrarCambioActual(ev);
-        ev.revisar(estadoConfirmado, LocalDateTime.now());
-        ev.setResponsableRevision(empleadoResponsable);
+    public Estado buscarDerivado(List<Estado> estados) {
+        for (Estado estado : estados) {
+            if ("Derivado".equals(estado.getNombre()) && "Evento".equals(estado.getAmbito())) {
+                return estado;
+            }
+        }
+        return new Estado("Derivado", "Evento"); // Fallback
+    }
+
+
+
+    public void confirmar(Estado estadoConfirmado, LocalDateTime fechaActual) {
+        EventoSismico ev = this.eventoSeleccionado;
+        Empleado empleado = empleadoResponsable;
+        ev.confirmar(estadoConfirmado, fechaActual);
         System.out.println("✔ Evento confirmado");
     }
 
-    public void rechazar(EventoSismico ev) {
-        Estado estadoRechazado = buscarRechazado(estadosDisponibles);
-        if (estadoRechazado == null) {
-            estadoRechazado = new Estado("Rechazado", "Revisión manual");
-        }
-
-        cerrarCambioActual(ev);
-        ev.revisar(estadoRechazado, LocalDateTime.now());
-        ev.setResponsableRevision(empleadoResponsable);
+    public void rechazar(Estado estadoRechazado, LocalDateTime fechaActual) {
+        EventoSismico ev = this.eventoSeleccionado;
+        Empleado empleado = empleadoResponsable;
+        this.eventoSeleccionado.rechazar(estadoRechazado, fechaActual, empleado);
         System.out.println("✖ Evento rechazado");
     }
 
-    public void derivar(EventoSismico ev) {
-        Estado estadoDerivado = estadosDisponibles.stream()
-                .filter(e -> e.getNombre().equals("Derivado") && e.getAmbito().equals("Revisión manual"))
-                .findFirst()
-                .orElse(new Estado("Derivado", "Revisión manual"));
 
-        cerrarCambioActual(ev);
-        ev.revisar(estadoDerivado, LocalDateTime.now());
-        ev.setResponsableRevision(empleadoResponsable);
+
+
+
+
+    public void derivar(Estado estadoDerivado, LocalDateTime fechaActual) {
+        EventoSismico ev = this.eventoSeleccionado;
+        Empleado empleado = empleadoResponsable;
+        ev.derivar(estadoDerivado, fechaActual);
         System.out.println("➡ Evento derivado a experto");
     }
 
-    private void cerrarCambioActual(EventoSismico ev) {
-        if (ev == null) return;
 
-        for (CambioEstado ce : ev.getCambiosEstado()) {
-            if (ce.sosActual()) {
-                ce.setFechaHoraFin(LocalDateTime.now());
-                ce.setResponsable(empleadoResponsable);
-                break;
-            }
-        }
-    }
 
 
 

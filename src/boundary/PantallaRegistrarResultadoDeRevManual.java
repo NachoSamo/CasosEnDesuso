@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.List;
+import java.util.Map;
 
 public class PantallaRegistrarResultadoDeRevManual {
 
@@ -102,18 +103,23 @@ public class PantallaRegistrarResultadoDeRevManual {
         }
 
         tablaEventos.setDisable(true);
-        mostrarDetalleES();
+
+        // 🟢 Esta línea es la clave
+        controladorCU.tomarSeleccionES(eventoSeleccionado);
+
         mostrarSismograma();
     }
 
-    private void mostrarDetalleES() {
+
+    public Map<String, String> mostrarDetalleES(Map<String, String> aco) {
         txtEventoSeleccionado.setText(eventoSeleccionado.getFechaHoraOcurrencia().toString());
-        txtAlcance.setText(eventoSeleccionado.getAlcanceSismo().getNombre());
-        txtClasificacion.setText(eventoSeleccionado.getClasificacionSismo().getNombre());
-        txtOrigen.setText(eventoSeleccionado.getOrigenGeneracion().getNombre());
+        txtAlcance.setText(aco.getOrDefault("alcance", ""));
+        txtClasificacion.setText(aco.getOrDefault("clasificacion", ""));
+        txtOrigen.setText(aco.getOrDefault("origen", ""));
+        return aco;
     }
 
-    private void mostrarSismograma() {
+    public void mostrarSismograma() {
         Image sismograma = controladorCU.generarSismograma(eventoSeleccionado);
         if (sismograma != null) {
             imagenSismograma.setImage(sismograma);
@@ -126,49 +132,57 @@ public class PantallaRegistrarResultadoDeRevManual {
 
     @FXML
     private void confirmarEvento() {
-        if (eventoSeleccionado == null) {
-            mostrarAlerta("Debe seleccionar un evento sísmico.");
-            return;
-        }
-        controladorCU.confirmar(eventoSeleccionado);
-        controladorCU.finCU("Acción ejecutada: Confirmar");
+        tomarAccion("confirmar");
     }
 
     @FXML
     private void rechazarEvento() {
-        if (eventoSeleccionado == null) {
-            mostrarAlerta("Debe seleccionar un evento sísmico.");
-            return;
-        }
-        if (eventoSeleccionado.getValorMagnitud() == 0
-                || eventoSeleccionado.getAlcanceSismo() == null
-                || eventoSeleccionado.getOrigenGeneracion() == null) {
-            mostrarAlerta("Faltan datos necesarios (magnitud, alcance u origen).");
-            return;
-        }
-        controladorCU.rechazar(eventoSeleccionado);
-        controladorCU.finCU("Acción ejecutada: Rechazar");
+        tomarAccion("rechazar");
     }
 
     @FXML
     private void derivarEvento() {
-        if (eventoSeleccionado == null) {
-            mostrarAlerta("Debe seleccionar un evento sísmico.");
-            return;
-        }
-        controladorCU.derivar(eventoSeleccionado);
-        controladorCU.finCU("Acción ejecutada: Derivar a experto");
+        tomarAccion("derivar");
     }
 
     @FXML
     private void cancelarAccion() {
-        if (eventoSeleccionado == null) {
-            mostrarAlerta("Debe seleccionar un evento sísmico.");
-            return;
-        }
-        controladorCU.cancelar(eventoSeleccionado);
-        mostrarDialogoYSalir("Evento restaurado al estado 'Auto Detectado'.");
+        tomarAccion("cancelar");
     }
+
+
+    public void habOptMapa() {
+        System.out.println("🗺 Se habilitó la opción de ver el mapa sísmico.");
+        // Aquí podrías agregar lógica para mostrar un mapa o realizar alguna acción relacionada.
+    }
+
+
+    /**
+     * Método centralizado para manejar las acciones de los botones
+     */
+    private void tomarAccion(String accion) {
+
+        switch (accion.toLowerCase()) {
+            case "confirmar" -> {
+                controladorCU.tomarAccion("confirmar");
+                controladorCU.finCU("Evento confirmado correctamente.");
+            }
+            case "rechazar" -> {
+                controladorCU.tomarAccion("rechazar");
+                controladorCU.finCU("Evento rechazado.");
+            }
+            case "derivar" -> {
+                controladorCU.tomarAccion("derivar");
+                controladorCU.finCU("Evento derivado a experto.");
+            }
+            case "cancelar" -> {
+                controladorCU.cancelar(eventoSeleccionado);
+                mostrarDialogoYSalir("Evento restaurado al estado anterior.");
+            }
+            default -> mostrarAlerta("Acción no reconocida.");
+        }
+    }
+
 
     private void mostrarDialogoYSalir(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

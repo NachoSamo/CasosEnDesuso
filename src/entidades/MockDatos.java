@@ -40,6 +40,7 @@ public class MockDatos {
 
 
 
+    // Mock completo con eventos sísmicos, series temporales y sismógrafos
     public static List<EventoSismico> obtenerEventosMock() {
         EventoSismico ev1 = new EventoSismico(LocalDateTime.of(2025, 5, 27, 14, 56), "32°54'S", "68°54'O", "12°54'S", "68°14'O", 3.5,
                 new ClasificacionSismo("Leve", 0, 70),
@@ -84,6 +85,13 @@ public class MockDatos {
                 new Estado("AutoConfirmado", "Evento")
         );
     }
+
+
+
+
+
+
+
 
 }
 

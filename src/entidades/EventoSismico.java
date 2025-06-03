@@ -165,43 +165,80 @@ public class EventoSismico {
         return resultado;
     }
 
-    public void confirmar(LocalDateTime fechaCambio, Empleado responsable) {
-        Estado estadoConfirmado = new Estado("Confirmado", "Revisión manual");
-        revisar(estadoConfirmado, fechaCambio);
-        this.fechaHoraRevision = fechaCambio;
-        this.responsableRevision = responsable;
+
+    public void confirmar(Estado estadoConfirmado, LocalDateTime fechaCambio) {
+        System.out.println("🔎 Buscando cambio de estado actual...");
+        CambioEstado ultimoCambio = buscarCEActual();
+        if (ultimoCambio != null) {
+            ultimoCambio.setFechaHoraFin(fechaCambio);
+            System.out.println("⏱ Cambio de estado actual cerrado");
+        }
+
+        crearNuevoCE(fechaCambio, null, estadoConfirmado);
+        System.out.println("🆕 Nuevo cambio de estado creado");
+
+        setEstado(estadoConfirmado);
+        System.out.println("🆕 Estado seteado");
+
         System.out.println("✔ Evento confirmado a las " + fechaCambio);
     }
 
-    public void derivar(LocalDateTime fechaCambio, Empleado responsable) {
-        Estado estadoDerivado = new Estado("Derivado", "Revisión manual");
-        revisar(estadoDerivado, fechaCambio);
-        this.fechaHoraRevision = fechaCambio;
-        this.responsableRevision = responsable;
+    public void derivar(Estado estadoDerivar, LocalDateTime fechaCambio) {
+        System.out.println("🔎 Buscando cambio de estado actual...");
+        CambioEstado ultimoCambio = buscarCEActual();
+        if (ultimoCambio != null) {
+            ultimoCambio.setFechaHoraFin(fechaCambio);
+            System.out.println("⏱ Cambio de estado actual cerrado");
+        }
+
+        crearNuevoCE(fechaCambio, null, estadoDerivar);
+        System.out.println("🆕 Nuevo cambio de estado creado");
+
+        setEstado(estadoDerivar);
+        System.out.println("🆕 Estado seteado");
+
         System.out.println("➡ Evento derivado a experto a las " + fechaCambio);
     }
 
-
-
-
     public void rechazar(Estado estadoRechazado, LocalDateTime fechaHoraActual, Empleado responsable) {
+        System.out.println("🔎 Buscando cambio de estado actual...");
         CambioEstado actual = buscarCEActual();
         if (actual != null) {
             actual.setFechaHoraFin(fechaHoraActual);
+            System.out.println("⏱ Cambio de estado actual cerrado");
         }
 
         crearNuevoCE(fechaHoraActual, null, estadoRechazado);
+        System.out.println("🆕 Nuevo cambio de estado creado");
+
         this.fechaHoraRevision = fechaHoraActual;
         this.responsableRevision = responsable;
+        System.out.println("🕒 FechaHora y Responsable de revision seteados");
+
+        setEstado(estadoRechazado);
+        System.out.println("🆕 Estado seteado");
+
+        System.out.println("❌ Evento rechazado a las " + fechaHoraActual);
     }
 
 
-    public void cancelar(LocalDateTime fechaCambio, Empleado responsable) {
-        Estado estadoAutodetectado = new Estado("Detectado", "Detección automática");
-        revisar(estadoAutodetectado, fechaCambio);
-        this.fechaHoraRevision = fechaCambio;
-        this.responsableRevision = responsable;
-        System.out.println("🔄 Evento regresado a estado Detectado a las " + fechaCambio);
-    }
 
+
+
+
+
+
+
+
+
+
+
+    public void validarExistencias(EventoSismico evento) {
+        if (evento.getValorMagnitud() == 0
+                || evento.getAlcanceSismo() == null
+                || evento.getOrigenGeneracion() == null) {
+            System.out.println("⚠ Faltan datos esenciales.");
+            return;
+        }
+    }
 }

@@ -21,6 +21,9 @@ public class SerieTemporal {
         this.muestrasSismicas = new ArrayList<>(); // ✅ aseguramos que no sea null
     }
 
+    public SerieTemporal(String st002) {
+    }
+
     // Getters y Setters
     public String getCondicionAlarma() {
         return condicionAlarma;

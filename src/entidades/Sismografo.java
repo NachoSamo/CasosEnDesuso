@@ -11,6 +11,7 @@ public class Sismografo {
     private int nroSerie;
     private EstacionSismologica estacionSismologica;
     private List<SerieTemporal> seriesTemporales;
+    private Object estacion;
 
     // Constructor
     public Sismografo(LocalDate fechaAdquisicion, int identificadorSismografo, int nroSerie,
@@ -20,6 +21,9 @@ public class Sismografo {
         this.nroSerie = nroSerie;
         this.estacionSismologica = estacionSismologica;
         this.seriesTemporales = seriesTemporales;
+    }
+
+    public Sismografo(String s1, EstacionSismologica est1) {
     }
 
     // Getters y Setters
@@ -76,4 +80,13 @@ public class Sismografo {
     }
 
 
+    public void agregarSerieTemporal(SerieTemporal serie) {
+        if (serie != null) {
+            this.seriesTemporales.add(serie);
+        }
+    }
 }
+
+
+
+
