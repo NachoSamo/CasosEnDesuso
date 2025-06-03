@@ -26,12 +26,15 @@ public class ControladorRegistrarResultadoDeRevManual {
     }
 
     // ✅ Paso inicial del caso de uso
-    public void registrarResultadoDeRevMan() {
+    public List<EventoSismico> registrarResultadoDeRevMan() {
         this.empleadoResponsable = buscarEmpleado();
+        List<EventoSismico> eventos = buscarESSinRevisar(); // Buscar sin ordenar
+        return ordenarESPorFechaHoraOcurrencia(eventos); // Devuelvo lista de eventos
     }
 
     public Empleado buscarEmpleado() {
-        Sesion sesionActual = new Sesion(LocalDateTime.now(), null, new Usuario("jperez", "admin"));
+        Usuario usuarioActual = empleadosSistema.get(0).getUsuario(); // Simulación de usuario actual
+        Sesion sesionActual = new Sesion(LocalDateTime.now(), null, usuarioActual);
         Usuario usuarioSesion = sesionActual.getUsuario();
         for (Empleado emp : empleadosSistema) {
             if (emp.esTuUsuario(usuarioSesion)) {
@@ -41,46 +44,17 @@ public class ControladorRegistrarResultadoDeRevManual {
         return null;
     }
 
-    public Empleado getEmpleadoLogead() {
+    public Empleado getEmpleadoResponsable() {
         return this.empleadoResponsable;
     }
 
-    // ✅ Mostrar ES sin revisar en la tabla
-    public void buscarESSinRevisar(
-            TableView<EventoSismico> tabla,
-            TableColumn<EventoSismico, String> colFechaHora,
-            TableColumn<EventoSismico, String> colEpicentro,
-            TableColumn<EventoSismico, String> colHipocentro,
-            TableColumn<EventoSismico, Double> colMagnitud
-    ) {
-        // Asociar las columnas con los atributos del modelo
-        colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrenciaTexto"));
-        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("latitudEpicentro"));
-        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("latitudHipocentro"));
-        colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
-
-        // Filtrar los eventos que aún no fueron revisados
+    public List<EventoSismico> buscarESSinRevisar() {
         List<EventoSismico> sinRevisar = eventosSimulados.stream()
                 .filter(EventoSismico::soySinRevisar)
                 .toList();
 
-        // Debug por consola y ejecución de getDatos()
-        if (sinRevisar.isEmpty()) {
-            System.out.println("⚠ No se encontraron eventos sin revisar.");
-        } else {
-            System.out.println("✅ Se encontraron " + sinRevisar.size() + " eventos sin revisar:");
-            for (EventoSismico ev : sinRevisar) {
-                Map<String, Object> datos = ev.getDatos();  // ← llamado explícito
-                System.out.println("📌 Evento:");
-                datos.forEach((k, v) -> System.out.println("  • " + k + ": " + v));
-            }
-        }
-
-        // Ordenar los eventos por fecha-hora de ocurrencia
-        List<EventoSismico> ordenados = ordenarESPorFechaHoraOcurrencia(sinRevisar);
-
-        // Cargar los eventos ordenados en la tabla
-        tabla.setItems(FXCollections.observableArrayList(ordenados));
+        sinRevisar.forEach(ev -> ev.getDatos()); // Forzar ejecución del getDatos
+        return sinRevisar; // Solo devolver la lista ordenada
     }
 
 

@@ -2,6 +2,7 @@ package boundary;
 
 import controlador.ControladorRegistrarResultadoDeRevManual;
 import entidades.EventoSismico;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -9,6 +10,8 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
+
+import java.util.List;
 
 public class PantallaRegistrarResultadoDeRevManual {
 
@@ -39,12 +42,19 @@ public class PantallaRegistrarResultadoDeRevManual {
     // paso 1: habilitar ventana
     @FXML
     public void habilitarPantalla() {
-        controladorCU.registrarResultadoDeRevMan(); // Se le pasa la pantalla como referencia
+        colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrenciaTexto"));
+        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("latitudEpicentro"));
+        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("latitudHipocentro"));
+        colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
+
+
+        List<EventoSismico> eventos = controladorCU.registrarResultadoDeRevMan();
+        // 3. LLAMO A mostrarES
+        mostrarES(eventos);
+        habComboAcciones();
         if (txtusername != null && controladorCU.getEmpleadoResponsable() != null) {
             txtusername.setText(controladorCU.getEmpleadoResponsable().getUsuario().getUsername());
         }
-        controladorCU.buscarESSinRevisar(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud);
-        habComboAcciones();
     }
 
 
@@ -52,11 +62,8 @@ public class PantallaRegistrarResultadoDeRevManual {
         comboAcciones.getItems().addAll("Confirmar", "Rechazar", "Derivar a experto");
     }
 
-    private void mostrarES() {
-        colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrenciaTexto"));
-        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("latitudEpicentro"));
-        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("latitudHipocentro"));
-        colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
+    private void mostrarES(List<EventoSismico> eventos) {
+        tablaEventos.setItems(FXCollections.observableArrayList(eventos));
     }
 
     @FXML
