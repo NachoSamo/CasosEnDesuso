@@ -34,7 +34,6 @@ public class ControladorRegistrarResultadoDeRevManual {
 
 
 
-
     // ✅ Paso inicial del caso de uso
     public List<EventoSismico> registrarResultadoDeRevMan(Sesion sesionActiva) {
         this.empleadoResponsable = buscarEmpleado(sesionActiva);
