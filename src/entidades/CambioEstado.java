@@ -38,4 +38,7 @@ public class CambioEstado {
     public void setFechaHoraFin() {
         this.fechaHoraFin = LocalDateTime.now();
     }
+
+    public void setResponsable(Empleado empleadoResponsable) {
+    }
 }

@@ -21,6 +21,9 @@ public class SerieTemporal {
         this.muestrasSismicas = new ArrayList<>(); // ✅ aseguramos que no sea null
     }
 
+    public SerieTemporal(String st002) {
+    }
+
     // Getters y Setters
     public String getCondicionAlarma() {
         return condicionAlarma;
@@ -58,17 +61,18 @@ public class SerieTemporal {
         this.muestrasSismicas = muestrasSismicas;
     }
 
-    // ✅ Método necesario para el diagrama de secuencia
     public List<MuestraSismica> getMuestrasSismicas() {
         return muestrasSismicas;
     }
 
-    public List<String> getDatosMuestrasSismicas() {
-        List<String> datos = new ArrayList<>();
+    public String getDatosMuestrasSismicas() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Datos de las muestras de la serie:{");
         for (MuestraSismica muestra : muestrasSismicas) {
-            datos.add(muestra.getDatos());
+            sb.append(muestra.getDatos()).append(", ");
         }
-        return datos;
+        sb.append("]}");
+        return sb.toString();
     }
 
     public void agregarMuestraSismica(MuestraSismica muestra) {

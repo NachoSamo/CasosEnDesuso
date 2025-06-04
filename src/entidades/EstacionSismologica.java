@@ -21,6 +21,10 @@ public class EstacionSismologica {
         this.nombre = nombre;
         this.nroCertificacionAdquisicion = nroCertificacionAdquisicion;
     }
+
+    public EstacionSismologica(String estacionOeste) {
+    }
+
     // Getters y Setters
     public String getCodigoEstacion() {
         return codigoEstacion;

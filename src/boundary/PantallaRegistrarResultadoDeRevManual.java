@@ -2,13 +2,21 @@ package boundary;
 
 import controlador.ControladorRegistrarResultadoDeRevManual;
 import entidades.EventoSismico;
+import entidades.MockDatos;
+import entidades.Sesion;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
+
+import java.util.List;
+import java.util.Map;
 
 public class PantallaRegistrarResultadoDeRevManual {
 
@@ -17,50 +25,67 @@ public class PantallaRegistrarResultadoDeRevManual {
     @FXML private TableColumn<EventoSismico, String> colEpicentro;
     @FXML private TableColumn<EventoSismico, String> colHipocentro;
     @FXML private TableColumn<EventoSismico, Double> colMagnitud;
-
+    @FXML private StackPane contenedorCentral;
+    @FXML private VBox vistaInicial;
+    @FXML private VBox vistaCU;
     @FXML private TextField txtEventoSeleccionado;
     @FXML private TextField txtAlcance;
     @FXML private TextField txtClasificacion;
     @FXML private TextField txtOrigen;
     @FXML private Label txtusername;
-    @FXML private ComboBox<String> comboAcciones;
-    @FXML private Button btnEjecutar;
     @FXML private Button btnCancelar;
     @FXML private ImageView imagenSismograma;
+    @FXML private HBox seccionBottom;
 
+    private Sesion sesionActiva;
     private EventoSismico eventoSeleccionado;
     private final ControladorRegistrarResultadoDeRevManual controladorCU = new ControladorRegistrarResultadoDeRevManual();
 
+    public void setSesion(Sesion sesion) {
+        this.sesionActiva = sesion;
+    }
+
+    @FXML
+    private void iniciarCU() {
+        vistaInicial.setVisible(false);
+        vistaInicial.setManaged(false);
+
+        vistaCU.setVisible(true);
+        vistaCU.setManaged(true);
+        seccionBottom.setVisible(true);
+        seccionBottom.setManaged(true);
+
+        initialize();
+    }
+
     @FXML
     public void initialize() {
-        habilitarPantalla();
+        List<Sesion> sesiones = MockDatos.obtenerSesionesMock();
+        Sesion sesionActiva = Sesion.obtenerSesionActiva(sesiones);
+        controladorCU.setBoundary(this);
+        controladorCU.registrarResultadoDeRevMan(sesionActiva);
+        habilitarPantalla(sesionActiva);
     }
 
-    // paso 1: habilitar ventana
     @FXML
-    public void habilitarPantalla() {
-        controladorCU.registrarResultadoDeRevMan(); // Se le pasa la pantalla como referencia
-        if (txtusername != null && controladorCU.getEmpleadoResponsable() != null) {
-            txtusername.setText(controladorCU.getEmpleadoResponsable().getUsuario().getUsername());
-        }
-        controladorCU.buscarESSinRevisar(tablaEventos, colFechaHora, colEpicentro, colHipocentro, colMagnitud);
-        habComboAcciones();
-    }
-
-
-    private void habComboAcciones() {
-        comboAcciones.getItems().addAll("Confirmar", "Rechazar", "Derivar a experto");
-    }
-
-    private void mostrarES() {
+    public void habilitarPantalla(Sesion sesionActiva) {
         colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrenciaTexto"));
-        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("latitudEpicentro"));
-        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("latitudHipocentro"));
+        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("coordEpicentro"));
+        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("coordHipocentro"));
         colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
+
+        List<EventoSismico> eventos = controladorCU.registrarResultadoDeRevMan(sesionActiva);
+        if (txtusername != null && controladorCU.buscarEmpleado(sesionActiva) != null) {
+            txtusername.setText(controladorCU.buscarEmpleado(sesionActiva).getUsuario().getUsername());
+        }
+    }
+
+    public void mostrarES(List<EventoSismico> eventos) {
+        tablaEventos.setItems(FXCollections.observableArrayList(eventos));
     }
 
     @FXML
-    private void solicitarSeleccionES() {
+    public void solicitarSeleccionES() {
         eventoSeleccionado = tablaEventos.getSelectionModel().getSelectedItem();
         if (eventoSeleccionado != null) {
             tomarSeleccionES();
@@ -78,18 +103,23 @@ public class PantallaRegistrarResultadoDeRevManual {
         }
 
         tablaEventos.setDisable(true);
-        mostrarDetalleES();
+
+        // 🟢 Esta línea es la clave
+        controladorCU.tomarSeleccionES(eventoSeleccionado);
+
         mostrarSismograma();
     }
 
-    private void mostrarDetalleES() {
-        txtEventoSeleccionado.setText(eventoSeleccionado.toString());
-        txtAlcance.setText(eventoSeleccionado.getAlcanceSismo().getNombre());
-        txtClasificacion.setText(eventoSeleccionado.getClasificacionSismo().getNombre());
-        txtOrigen.setText(eventoSeleccionado.getOrigenGeneracion().getNombre());
+
+    public Map<String, String> mostrarDetalleES(Map<String, String> aco) {
+        txtEventoSeleccionado.setText(eventoSeleccionado.getFechaHoraOcurrencia().toString());
+        txtAlcance.setText(aco.getOrDefault("alcance", ""));
+        txtClasificacion.setText(aco.getOrDefault("clasificacion", ""));
+        txtOrigen.setText(aco.getOrDefault("origen", ""));
+        return aco;
     }
 
-    private void mostrarSismograma() {
+    public void mostrarSismograma() {
         Image sismograma = controladorCU.generarSismograma(eventoSeleccionado);
         if (sismograma != null) {
             imagenSismograma.setImage(sismograma);
@@ -101,42 +131,57 @@ public class PantallaRegistrarResultadoDeRevManual {
     }
 
     @FXML
-    private void tomarAccion() {
-        String accion = comboAcciones.getValue();
-        if (eventoSeleccionado == null) {
-            mostrarAlerta("Debe seleccionar un evento sísmico.");
-            return;
-        }
-        if (accion == null) {
-            mostrarAlerta("Debe seleccionar una acción a ejecutar.");
-            return;
-        }
-        switch (accion.toLowerCase()) {
-            case "confirmar" -> controladorCU.confirmar(eventoSeleccionado);
-            case "rechazar" -> {
-                if (eventoSeleccionado.getValorMagnitud() == 0
-                        || eventoSeleccionado.getAlcanceSismo() == null
-                        || eventoSeleccionado.getOrigenGeneracion() == null) {
-                    mostrarAlerta("Faltan datos necesarios (magnitud, alcance u origen).");
-                    return;
-                }
-                controladorCU.rechazar(eventoSeleccionado);
-            }
-            case "derivar a experto" -> controladorCU.derivar(eventoSeleccionado);
-            default -> mostrarAlerta("Acción no reconocida.");
-        }
-        controladorCU.finCU("Acción ejecutada: " + accion);
+    private void confirmarEvento() {
+        tomarAccion("confirmar");
+    }
+
+    @FXML
+    private void rechazarEvento() {
+        tomarAccion("rechazar");
+    }
+
+    @FXML
+    private void derivarEvento() {
+        tomarAccion("derivar");
     }
 
     @FXML
     private void cancelarAccion() {
-        if (eventoSeleccionado == null) {
-            mostrarAlerta("Debe seleccionar un evento sísmico.");
-            return;
-        }
-        controladorCU.cancelar(eventoSeleccionado);
-        mostrarDialogoYSalir("Evento restaurado al estado 'Auto Detectado'.");
+        tomarAccion("cancelar");
     }
+
+
+    public void habOptMapa() {
+        System.out.println("🗺 Se habilitó la opción de ver el mapa sísmico.");
+        // Aquí podrías agregar lógica para mostrar un mapa o realizar alguna acción relacionada.
+    }
+
+
+    /**
+     * Método centralizado para manejar las acciones de los botones
+     */
+    private void tomarAccion(String accion) {
+
+        switch (accion.toLowerCase()) {
+            case "confirmar" -> {
+                controladorCU.tomarAccion("confirmar");
+            }
+            case "rechazar" -> {
+                controladorCU.tomarAccion("rechazar");
+            }
+            case "derivar" -> {
+                controladorCU.tomarAccion("derivar");
+            }
+            case "cancelar" -> {
+                controladorCU.cancelar(eventoSeleccionado);
+                controladorCU.finCU("Cancelacion de Revision de evento");
+                mostrarDialogoYSalir("Evento restaurado al estado anterior.");
+
+            }
+            default -> mostrarAlerta("Acción no reconocida.");
+        }
+    }
+
 
     private void mostrarDialogoYSalir(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

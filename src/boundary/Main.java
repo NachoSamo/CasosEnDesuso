@@ -25,7 +25,8 @@ public class Main extends Application {
             // scene.getStylesheets().add(getClass().getResource("/styles/styles.css").toExternalForm());
 
             // Configurar la ventana principal
-            primaryStage.setTitle("Sistema de Casos en Desuso");
+            primaryStage.setTitle("Sistema de Red Sismica");
+            primaryStage.setMaximized(true);
             primaryStage.setScene(scene);
             primaryStage.show();
 
