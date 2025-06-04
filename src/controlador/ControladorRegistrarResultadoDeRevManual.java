@@ -187,15 +187,18 @@ public class ControladorRegistrarResultadoDeRevManual {
             case "confirmar" -> {
                 Estado estadoConfirmado = buscarConfirmado(estadosDisponibles);
                 confirmar(estadoConfirmado, fechaActual);
+                finCU("Evento confirmado correctamente.");
             }
             case "rechazar" -> {
                 Estado estadoRechazado = buscarRechazado(estadosDisponibles);
                 rechazar(estadoRechazado, fechaActual);
-                
+                finCU("Evento Rechazado correctamente.");
             }
             case "derivar" -> {
                 Estado estadoDerivado = buscarDerivado(estadosDisponibles);
                 derivar(estadoDerivado, fechaActual);
+                finCU("Evento derivado a Experto.");
+
             }
             default -> System.out.println("⚠ Acción no reconocida: " + accion);
         }

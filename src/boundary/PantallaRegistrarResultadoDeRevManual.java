@@ -165,19 +165,18 @@ public class PantallaRegistrarResultadoDeRevManual {
         switch (accion.toLowerCase()) {
             case "confirmar" -> {
                 controladorCU.tomarAccion("confirmar");
-                controladorCU.finCU("Evento confirmado correctamente.");
             }
             case "rechazar" -> {
                 controladorCU.tomarAccion("rechazar");
-                controladorCU.finCU("Evento rechazado.");
             }
             case "derivar" -> {
                 controladorCU.tomarAccion("derivar");
-                controladorCU.finCU("Evento derivado a experto.");
             }
             case "cancelar" -> {
                 controladorCU.cancelar(eventoSeleccionado);
+                controladorCU.finCU("Cancelacion de Revision de evento");
                 mostrarDialogoYSalir("Evento restaurado al estado anterior.");
+
             }
             default -> mostrarAlerta("Acción no reconocida.");
         }
