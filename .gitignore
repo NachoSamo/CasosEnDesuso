@@ -1,17 +1,13 @@
-# Maven
+# Archivos generados por Maven
 /target/
 
-# IntelliJ
-/.idea/
-/*.iml
-/out/
+# Archivos de configuración de IntelliJ IDEA
+.idea/
+*.iml
 
-# NetBeans
-/nbproject/
+# Archivos de logs
+*.log
 
-# Sistema operativo
+# Archivos del sistema operativo
 .DS_Store
 Thumbs.db
-
-# Logs
-*.log
