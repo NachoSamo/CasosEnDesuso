@@ -1,33 +1,18 @@
 package entidades;
 
 import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Usuario {
     private String username;
     private String password;
-
-    // Constructor
-    public Usuario(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    // Getters y Setters
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     // ✅ Comparación por username
     @Override

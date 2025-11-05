@@ -1,8 +1,15 @@
 package entidades;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class EventoSismico {
     private LocalDateTime fechaHoraFin;
     private LocalDateTime fechaHoraOcurrencia;
@@ -36,52 +43,6 @@ public class EventoSismico {
         this.cambiosEstado = new ArrayList<>();
         this.seriesTemporales = new ArrayList<>();
     }
-
-    // --- Getters y Setters ---
-    public LocalDateTime getFechaHoraFin() { return fechaHoraFin; }
-    public void setFechaHoraFin(LocalDateTime fechaHoraFin) { this.fechaHoraFin = fechaHoraFin; }
-
-    public LocalDateTime getFechaHoraOcurrencia() { return fechaHoraOcurrencia; }
-    public void setFechaHoraOcurrencia(LocalDateTime fechaHoraOcurrencia) { this.fechaHoraOcurrencia = fechaHoraOcurrencia; }
-
-    public String getLatitudEpicentro() { return latitudEpicentro; }
-    public void setLatitudEpicentro(String latitudEpicentro) { this.latitudEpicentro = latitudEpicentro; }
-
-    public String getLongitudEpicentro() { return longitudEpicentro; }
-    public void setLongitudEpicentro(String longitudEpicentro) { this.longitudEpicentro = longitudEpicentro; }
-
-    public String getLatitudHipocentro() { return latitudHipocentro; }
-    public void setLatitudHipocentro(String latitudHipocentro) { this.latitudHipocentro = latitudHipocentro; }
-
-    public String getLongitudHipocentro() { return longitudHipocentro; }
-    public void setLongitudHipocentro(String longitudHipocentro) { this.longitudHipocentro = longitudHipocentro; }
-
-    public double getValorMagnitud() { return valorMagnitud; }
-    public void setValorMagnitud(double valorMagnitud) { this.valorMagnitud = valorMagnitud; }
-
-    public List<CambioEstado> getCambiosEstado() { return cambiosEstado; }
-    public void setCambiosEstado(ArrayList<CambioEstado> cambiosEstado) { this.cambiosEstado = cambiosEstado; }
-
-    public Estado getEstado() { return estado; }
-    public void setEstado(Estado estado) { this.estado = estado; }
-
-    public ClasificacionSismo getClasificacionSismo() { return clasificacionSismo; }
-    public void setClasificacionSismo(ClasificacionSismo clasificacionSismo) { this.clasificacionSismo = clasificacionSismo; }
-
-    public AlcanceSismo getAlcanceSismo() { return alcanceSismo; }
-    public void setAlcanceSismo(AlcanceSismo alcanceSismo) { this.alcanceSismo = alcanceSismo; }
-
-    public OrigenDeGeneracion getOrigenGeneracion() { return origenGeneracion; }
-    public void setOrigenGeneracion(OrigenDeGeneracion origenGeneracion) { this.origenGeneracion = origenGeneracion; }
-
-    public List<SerieTemporal> getSeriesTemporales() { return seriesTemporales; }
-    public void setSeriesTemporales(List<SerieTemporal> seriesTemporales) { this.seriesTemporales = seriesTemporales; }
-
-    public LocalDateTime getFechaHoraRevision() { return fechaHoraRevision; }
-    public void setFechaHoraRevision(LocalDateTime fechaHoraRevision) { this.fechaHoraRevision = fechaHoraRevision; }
-
-    public Empleado getResponsableRevision() { return responsableRevision; }
-    public void setResponsableRevision(Empleado responsableRevision) { this.responsableRevision = responsableRevision; }
 
     public Boolean soySinRevisar() {
         return this.estado != null && this.estado.soySinRevisar();
@@ -220,18 +181,6 @@ public class EventoSismico {
 
         System.out.println("❌ Evento rechazado a las " + fechaHoraActual);
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     public void validarExistencias(EventoSismico evento) {
         if (evento.getValorMagnitud() == 0

@@ -1,32 +1,16 @@
 package entidades;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Estado {
     // Atributos
     private String nombreEstado;
     private String ambito;
-
-    // Constructor
-    public Estado(String nombreEstado, String ambito) {
-        this.nombreEstado = nombreEstado;
-        this.ambito = ambito;
-    }
-
-    // Getters y Setters
-    public String getNombre() {
-        return nombreEstado;
-    }
-
-    public void setNombre(String nombreEstado) {
-        this.nombreEstado = nombreEstado;
-    }
-
-    public String getAmbito() {
-        return ambito;
-    }
-
-    public void setAmbito(String ambito) {
-        this.ambito = ambito;
-    }
 
     // Métodos de comparación de estado
     public boolean soyPendienteDeRevision() {

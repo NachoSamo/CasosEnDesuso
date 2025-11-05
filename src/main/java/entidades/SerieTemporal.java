@@ -1,9 +1,13 @@
 package entidades;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
 public class SerieTemporal {
     private String condicionAlarma;
     private LocalDateTime fechaHoraInicioRegistroMuestras;
@@ -24,46 +28,6 @@ public class SerieTemporal {
     public SerieTemporal(String st002) {
     }
 
-    // Getters y Setters
-    public String getCondicionAlarma() {
-        return condicionAlarma;
-    }
-
-    public void setCondicionAlarma(String condicionAlarma) {
-        this.condicionAlarma = condicionAlarma;
-    }
-
-    public LocalDateTime getFechaHoraInicioRegistroMuestras() {
-        return fechaHoraInicioRegistroMuestras;
-    }
-
-    public void setFechaHoraInicioRegistroMuestras(LocalDateTime fechaHoraInicioRegistroMuestras) {
-        this.fechaHoraInicioRegistroMuestras = fechaHoraInicioRegistroMuestras;
-    }
-
-    public LocalDateTime getFechaHoraRegistro() {
-        return fechaHoraRegistro;
-    }
-
-    public void setFechaHoraRegistro(LocalDateTime fechaHoraRegistro) {
-        this.fechaHoraRegistro = fechaHoraRegistro;
-    }
-
-    public double getFrecuenciaMuestreo() {
-        return frecuenciaMuestreo;
-    }
-
-    public void setFrecuenciaMuestreo(double frecuenciaMuestreo) {
-        this.frecuenciaMuestreo = frecuenciaMuestreo;
-    }
-
-    public void setMuestrasSismicas(List<MuestraSismica> muestrasSismicas) {
-        this.muestrasSismicas = muestrasSismicas;
-    }
-
-    public List<MuestraSismica> getMuestrasSismicas() {
-        return muestrasSismicas;
-    }
 
     public String getDatosMuestrasSismicas() {
         StringBuilder sb = new StringBuilder();

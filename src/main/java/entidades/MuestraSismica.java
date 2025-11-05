@@ -1,8 +1,12 @@
 package entidades;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 
+@Data
+@NoArgsConstructor
 public class MuestraSismica {
     private LocalDateTime fechaHoraMuestra;
     private List<DetalleMuestraSismica> detallesMuestraSismica;
@@ -11,20 +15,6 @@ public class MuestraSismica {
     public MuestraSismica(LocalDateTime fechaHoraMuestra) {
         this.fechaHoraMuestra = fechaHoraMuestra;
         this.detallesMuestraSismica = new ArrayList<>();
-    }
-    // Getters y Setters
-    public LocalDateTime getFechaHoraMuestra() {
-        return fechaHoraMuestra;
-    }
-    public void setFechaHoraMuestra(LocalDateTime fechaHoraMuestra) {
-        this.fechaHoraMuestra = fechaHoraMuestra;
-    }
-
-    public List<DetalleMuestraSismica> getDetallesMuestra() {
-        return detallesMuestraSismica;
-    }
-    public void setDetallesMuestra(List<DetalleMuestraSismica> detallesMuestra) {
-        this.detallesMuestraSismica = detallesMuestra;
     }
 
     // Métodos para agregar y eliminar detalles de la muestra sísmica

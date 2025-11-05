@@ -218,7 +218,7 @@ public class ControladorRegistrarResultadoDeRevManual {
 
     public Estado buscarConfirmado(List<Estado> estados) {
         for (Estado estado : estados) {
-            if ("Confirmado".equals(estado.getNombre()) && "Evento".equals(estado.getAmbito())) {
+            if ("Confirmado".equals(estado.getNombreEstado()) && "Evento".equals(estado.getAmbito())) {
                 return estado;
             }
         }
@@ -227,7 +227,7 @@ public class ControladorRegistrarResultadoDeRevManual {
 
     public Estado buscarDerivado(List<Estado> estados) {
         for (Estado estado : estados) {
-            if ("Derivado".equals(estado.getNombre()) && "Evento".equals(estado.getAmbito())) {
+            if ("Derivado".equals(estado.getNombreEstado()) && "Evento".equals(estado.getAmbito())) {
                 return estado;
             }
         }
@@ -285,7 +285,7 @@ public class ControladorRegistrarResultadoDeRevManual {
 
         // Crear nuevo cambio con el estado anterior
         ev.revisar(estadoAnterior, LocalDateTime.now());
-        System.out.println("↩ Evento restaurado a estado anterior: " + estadoAnterior.getNombre());
+        System.out.println("↩ Evento restaurado a estado anterior: " + estadoAnterior.getNombreEstado());
     }
 
 

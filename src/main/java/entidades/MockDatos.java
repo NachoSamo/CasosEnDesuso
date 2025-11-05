@@ -62,7 +62,7 @@ public class MockDatos {
 
         System.out.println("📦 Mock de eventos creado:");
         for (EventoSismico ev : List.of(ev1, ev2, ev3)) {
-            System.out.println(" - " + ev.getFechaHoraOcurrencia() + " | Estado: " + ev.getEstado().getNombre());
+            System.out.println(" - " + ev.getFechaHoraOcurrencia() + " | Estado: " + ev.getEstado().getNombreEstado());
         }
 
         return FXCollections.observableArrayList(ev1, ev2, ev3);
