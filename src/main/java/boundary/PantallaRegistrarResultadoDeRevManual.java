@@ -1,6 +1,6 @@
 package boundary;
 
-import controlador.ControladorRegistrarResultadoDeRevManual;
+import gestor.GestorRevManual;
 import entidades.EventoSismico;
 import entidades.MockDatos;
 import entidades.Sesion;
@@ -39,7 +39,7 @@ public class PantallaRegistrarResultadoDeRevManual {
 
     private Sesion sesionActiva;
     private EventoSismico eventoSeleccionado;
-    private final ControladorRegistrarResultadoDeRevManual controladorCU = new ControladorRegistrarResultadoDeRevManual();
+    private final GestorRevManual controladorCU = new GestorRevManual();
 
     public void setSesion(Sesion sesion) {
         this.sesionActiva = sesion;

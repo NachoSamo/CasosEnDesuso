@@ -1,4 +1,4 @@
-package controlador;
+package gestor;
 
 import boundary.PantallaRegistrarResultadoDeRevManual;
 import casosDeUso.GenerarSismograma;
@@ -11,7 +11,7 @@ import javafx.stage.Window;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class ControladorRegistrarResultadoDeRevManual {
+public class GestorRevManual {
 
     private Empleado empleadoResponsable;
     private List<Empleado> empleadosSistema;
@@ -26,7 +26,7 @@ public class ControladorRegistrarResultadoDeRevManual {
     }
 
 
-    public ControladorRegistrarResultadoDeRevManual() {
+    public GestorRevManual() {
         estadosDisponibles = MockDatos.obtenerEstadosMock();
         empleadosSistema = MockDatos.obtenerEmpleadosMock();
         eventosSimulados = MockDatos.obtenerEventosMock();
