@@ -14,6 +14,8 @@ import java.util.*;
 @AllArgsConstructor
 public class EventoSismico {
 
+    private String id;
+
     private LocalDateTime fechaHoraFin;
     private LocalDateTime fechaHoraOcurrencia;
     private String latitudEpicentro;

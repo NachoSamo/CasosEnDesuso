@@ -3,6 +3,9 @@ package gestor;
 import boundary.PantallaRegistrarResultadoDeRevManual;
 import imagenSismograma.GenerarSismograma;
 import entidades.*;
+import persistence.repository.EventoSismicoRepository;
+import persistence.repository.EmpleadoRepository;
+import persistence.repository.EventoHistorialRepository;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -17,6 +20,9 @@ public class GestorRevManual {
     private Empleado empleadoResponsable;
     private List<Empleado> empleadosSistema;
     private List<EventoSismico> eventosSimulados;
+    private final EventoSismicoRepository eventoRepo = new EventoSismicoRepository();
+    private final EmpleadoRepository empleadoRepo = new EmpleadoRepository();
+    private final EventoHistorialRepository historialRepo = new EventoHistorialRepository();
     private EventoSismico eventoSeleccionado;
     private final GenerarSismograma controladorSismograma = new GenerarSismograma();
     private PantallaRegistrarResultadoDeRevManual boundaryRef;
@@ -26,8 +32,21 @@ public class GestorRevManual {
     }
 
     public GestorRevManual() {
-        empleadosSistema = MockDatos.obtenerEmpleadosMock();
-        eventosSimulados = MockDatos.obtenerEventosMock();
+        // attempt to load from DB; fallback to MockDatos if DB not ready or empty
+        try {
+            empleadosSistema = empleadoRepo.findAll();
+            eventosSimulados = eventoRepo.findPendientes();
+            if (empleadosSistema == null || empleadosSistema.isEmpty()) {
+                empleadosSistema = MockDatos.obtenerEmpleadosMock();
+            }
+            if (eventosSimulados == null || eventosSimulados.isEmpty()) {
+                eventosSimulados = MockDatos.obtenerEventosMock();
+            }
+        } catch (Throwable t) {
+            // DB not initialized or error; use mocks
+            empleadosSistema = MockDatos.obtenerEmpleadosMock();
+            eventosSimulados = MockDatos.obtenerEventosMock();
+        }
     }
 
     public List<EventoSismico> registrarResultadoDeRevMan(Sesion sesionActiva) {
@@ -44,10 +63,14 @@ public class GestorRevManual {
     public Empleado buscarEmpleado(Sesion sesionActiva) {
         if (sesionActiva == null) return null;
         Usuario usuarioSesion = sesionActiva.getUsuario();
+        // try DB lookup by username first
+        if (usuarioSesion != null && usuarioSesion.getUsername() != null) {
+            Empleado emp = empleadoRepo.findByUsuarioUsername(usuarioSesion.getUsername());
+            if (emp != null) return emp;
+        }
+        // fallback to in-memory list
         for (Empleado emp : empleadosSistema) {
-            if (emp.esTuUsuario(usuarioSesion)) {
-                return emp;
-            }
+            if (emp.esTuUsuario(usuarioSesion)) return emp;
         }
         return null;
     }
@@ -101,18 +124,28 @@ public class GestorRevManual {
             switch (accion.toLowerCase()) {
                 case "confirmar" -> {
                     eventoSeleccionado.confirmar(fechaActual, empleadoResponsable);
+                    // persist change and historial
+                    eventoRepo.save(eventoSeleccionado);
+                    CambioEstadoES cambio = eventoSeleccionado.getCambioEstadoActual();
+                    if (cambio != null) historialRepo.saveCambio(eventoSeleccionado.getId(), cambio);
                     String estadoNombre = eventoSeleccionado.getEstado() != null ? eventoSeleccionado.getEstado().getNombre() : "UNKNOWN";
                     String msg = "Estado del evento sismico: " + eventoSeleccionado.toString() + " ha sido cambiado a " + estadoNombre;
                     System.out.println(msg);
                 }
                 case "rechazar" -> {
                     eventoSeleccionado.rechazar(fechaActual, empleadoResponsable);
+                    eventoRepo.save(eventoSeleccionado);
+                    CambioEstadoES cambio2 = eventoSeleccionado.getCambioEstadoActual();
+                    if (cambio2 != null) historialRepo.saveCambio(eventoSeleccionado.getId(), cambio2);
                     String estadoNombre = eventoSeleccionado.getEstado() != null ? eventoSeleccionado.getEstado().getNombre() : "UNKNOWN";
                     String msg = "Estado del evento sismico: " + eventoSeleccionado.toString() + " ha sido cambiado a " + estadoNombre;
                     System.out.println(msg);
                 }
                 case "derivar" -> {
                     eventoSeleccionado.derivar(fechaActual, empleadoResponsable);
+                    eventoRepo.save(eventoSeleccionado);
+                    CambioEstadoES cambio3 = eventoSeleccionado.getCambioEstadoActual();
+                    if (cambio3 != null) historialRepo.saveCambio(eventoSeleccionado.getId(), cambio3);
                     String estadoNombre = eventoSeleccionado.getEstado() != null ? eventoSeleccionado.getEstado().getNombre() : "UNKNOWN";
                     String msg = "Estado del evento sismico: " + eventoSeleccionado.toString() + " ha sido cambiado a " + estadoNombre;
                     System.out.println(msg);

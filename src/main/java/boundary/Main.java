@@ -37,6 +37,13 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        // Initialize database (migrations) before launching UI
+        try {
+            persistence.DBInitializer.init();
+        } catch (Throwable t) {
+            System.err.println("Error inicializando la base de datos: " + t.getMessage());
+            t.printStackTrace();
+        }
         launch(args);
     }
 }

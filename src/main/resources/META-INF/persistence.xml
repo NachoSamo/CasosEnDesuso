@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0">
+  <persistence-unit name="redSismicaPU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+    <!-- entity classes -->
+    <class>persistence.entities.EventoSismicoEntity</class>
+    <class>persistence.entities.EmpleadoEntity</class>
+    <class>persistence.entities.EstadoEventoEntity</class>
+    <class>persistence.entities.ClasificacionSismoEntity</class>
+    <class>persistence.entities.AlcanceSismoEntity</class>
+    <class>persistence.entities.OrigenDeGeneracionEntity</class>
+    <class>persistence.entities.EventoHistorialEstadoEntity</class>
+    <class>persistence.entities.EventoBloqueoRevisionEntity</class>
+    <class>persistence.entities.EventoDerivacionEntity</class>
+
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:./data/red_sismica;AUTO_SERVER=TRUE"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value=""/>
+
+      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+      <property name="hibernate.hbm2ddl.auto" value="validate"/>
+      <property name="hibernate.show_sql" value="false"/>
+      <property name="hibernate.format_sql" value="false"/>
+    </properties>
+  </persistence-unit>
+</persistence>
