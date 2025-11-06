@@ -11,3 +11,7 @@
 # Archivos del sistema operativo
 .DS_Store
 Thumbs.db
+
+/data/red_sismica.lock.db
+/data/red_sismica.mv.db
+/data/red_sismica.trace.db
