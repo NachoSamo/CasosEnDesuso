@@ -1,23 +1,64 @@
 package entidades.estadosConcretos;
 
-import entidades.CambioEstado;
+import entidades.CambioEstadoES;
 import entidades.Empleado;
-import entidades.Estado;
 import entidades.EventoSismico;
+import entidades.estadoPadreAbstracto.EstadoES;
 
 import java.time.LocalDateTime;
 
-public class EnRevision extends Estado {
+public class EnRevision extends EstadoES {
 
-    public void rechazar(LocalDateTime fechahora, Empleado empleado
-            , EventoSismico eventoSismico, CambioEstado[] cambiosEstado) {
+    public EnRevision() {
+        super("EnRevision");
     }
 
-    public void confirmar(){
-        System.out.println("Metodo que no corresponde al flujo normal del CU");
+    @Override
+    public void confirmar(EventoSismico es, LocalDateTime fh, Empleado resp) {
+        es.validarExistencias(); // Lógica de negocio del CU
+
+        // Lógica de transición
+        CambioEstadoES actual = es.getCambioEstadoActual();
+        actual.setFechaHoraFin(fh);
+
+        EstadoES nuevoEstado = new Confirmado();
+        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, null, resp, nuevoEstado);
+
+        es.agregarCE(nuevoCambio);
+        es.setEstado(nuevoEstado);
     }
 
-    public void derivar() {
-        System.out.println("Metodo que no corresponde al flujo normal del CU");
+    @Override
+    public void rechazar(EventoSismico es, LocalDateTime fh, Empleado resp) {
+        es.validarExistencias(); // Lógica de negocio del CU
+
+        // Lógica específica de 'rechazar' del CU
+        es.setFechaHoraRevision(fh);
+        es.setResponsableRevision(resp);
+
+        // Lógica de transición
+        CambioEstadoES actual = es.getCambioEstadoActual();
+        actual.setFechaHoraFin(fh);
+
+        EstadoES nuevoEstado = new Rechazado();
+        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, null, resp, nuevoEstado);
+
+        es.agregarCE(nuevoCambio);
+        es.setEstado(nuevoEstado);
+    }
+
+    @Override
+    public void derivar(EventoSismico es, LocalDateTime fh, Empleado resp) {
+        es.validarExistencias(); // Lógica de negocio del CU
+
+        // Lógica de transición
+        CambioEstadoES actual = es.getCambioEstadoActual();
+        actual.setFechaHoraFin(fh);
+
+        EstadoES nuevoEstado = new Derivado();
+        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, null, resp, nuevoEstado);
+
+        es.agregarCE(nuevoCambio);
+        es.setEstado(nuevoEstado);
     }
 }

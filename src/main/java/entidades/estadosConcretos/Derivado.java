@@ -1,23 +1,45 @@
 package entidades.estadosConcretos;
 
-import entidades.CambioEstado;
+import entidades.CambioEstadoES;
 import entidades.Empleado;
-import entidades.Estado;
 import entidades.EventoSismico;
+import entidades.estadoPadreAbstracto.EstadoES;
 
 import java.time.LocalDateTime;
 
-public class Derivado extends Estado {
-
-    public void rechazar(LocalDateTime fechahora, Empleado empleado
-            , EventoSismico eventoSismico, CambioEstado[] cambiosEstado) {
-
+public class Derivado extends EstadoES {
+    public Derivado() {
+        super("Derivado");
     }
 
-    public void confirmar() {
-        System.out.println("Metodo que no corresponde al flujo normal del CU");
+    @Override
+    public void confirmar(EventoSismico es, LocalDateTime fh, Empleado resp) {
+        es.validarExistencias();
 
+        CambioEstadoES actual = es.getCambioEstadoActual();
+        actual.setFechaHoraFin(fh);
+
+        EstadoES nuevoEstado = new Confirmado();
+        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, null, resp, nuevoEstado);
+
+        es.agregarCE(nuevoCambio);
+        es.setEstado(nuevoEstado);
     }
 
+    @Override
+    public void rechazar(EventoSismico es, LocalDateTime fh, Empleado resp) {
+        es.validarExistencias();
 
+        es.setFechaHoraRevision(fh);
+        es.setResponsableRevision(resp);
+
+        CambioEstadoES actual = es.getCambioEstadoActual();
+        actual.setFechaHoraFin(fh);
+
+        EstadoES nuevoEstado = new Rechazado();
+        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, null, resp, nuevoEstado);
+
+        es.agregarCE(nuevoCambio);
+        es.setEstado(nuevoEstado);
+    }
 }

@@ -1,5 +1,7 @@
 package entidades;
 
+import entidades.estadoPadreAbstracto.EstadoES;
+import entidades.estadosConcretos.AutoDetectado;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +13,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventoSismico {
+
     private LocalDateTime fechaHoraFin;
     private LocalDateTime fechaHoraOcurrencia;
     private String latitudEpicentro;
@@ -20,8 +23,8 @@ public class EventoSismico {
     private double valorMagnitud;
     private LocalDateTime fechaHoraRevision;
     private Empleado responsableRevision;
-    private ArrayList<CambioEstado> cambiosEstado;
-    private Estado estado;
+    private List<CambioEstadoES> cambiosEstado;
+    private EstadoES estado;
     private ClasificacionSismo clasificacionSismo;
     private AlcanceSismo alcanceSismo;
     private OrigenDeGeneracion origenGeneracion;
@@ -40,13 +43,53 @@ public class EventoSismico {
         this.clasificacionSismo = clasificacionSismo;
         this.alcanceSismo = alcanceSismo;
         this.origenGeneracion = origenGeneracion;
-        this.cambiosEstado = new ArrayList<>();
         this.seriesTemporales = new ArrayList<>();
+
+        this.cambiosEstado = new ArrayList<>();
+        EstadoES estadoInicial = new AutoDetectado();
+        this.estado = estadoInicial;
+        this.cambiosEstado.add(new CambioEstadoES(LocalDateTime.now(), null, null, estadoInicial));
     }
 
-    public Boolean soySinRevisar() {
-        return this.estado != null && this.estado.soySinRevisar();
+    public void revisar(LocalDateTime fh, Empleado resp) {
+        this.estado.revisar(this, fh, resp);
     }
+
+    public void confirmar(LocalDateTime fh, Empleado resp) {
+        this.estado.confirmar(this, fh, resp);
+    }
+
+    public void rechazar(LocalDateTime fh, Empleado resp) {
+        this.estado.rechazar(this, fh, resp);
+    }
+
+    public void derivar(LocalDateTime fh, Empleado resp) {
+        this.estado.derivar(this, fh, resp);
+    }
+
+    public void agregarCE(CambioEstadoES nuevoCambio) {
+        this.cambiosEstado.add(nuevoCambio);
+    }
+
+    public CambioEstadoES getCambioEstadoActual() {
+        return this.cambiosEstado.stream()
+                .filter(CambioEstadoES::esActual)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Boolean soyAutoDetectado() {
+        return this.estado instanceof AutoDetectado;
+    }
+
+    public void validarExistencias() {
+        if (this.getValorMagnitud() == 0
+                || this.getAlcanceSismo() == null
+                || this.getOrigenGeneracion() == null) {
+            throw new IllegalStateException("Faltan datos esenciales (magnitud, alcance u origen) para el evento.");
+        }
+    }
+
     public String getFechaHoraOcurrenciaTexto() {
         return this.fechaHoraOcurrencia != null ? this.fechaHoraOcurrencia.toString() : "";
     }
@@ -68,41 +111,13 @@ public class EventoSismico {
         return getLatitudHipocentro() + getLongitudHipocentro();
     }
 
-
-
     public Map<SerieTemporal, List<String>> getDatosMuestrasSismicas() {
-        System.out.println("📡 Obteniendo series temporales para el evento: " + this);
         Map<SerieTemporal, List<String>> datosSeries = new HashMap<>();
-
         for (SerieTemporal serie : seriesTemporales) {
             List<String> muestrasInfo = Collections.singletonList(serie.getDatosMuestrasSismicas());
             datosSeries.put(serie, muestrasInfo);
         }
-        System.out.println("✅ Datos extraídos de las series: " + datosSeries);
         return datosSeries;
-    }
-
-
-
-    public void revisar(Estado nuevoEstado, LocalDateTime fechaCambio) {
-        CambioEstado ultimoCambio = buscarCEActual();
-        if (ultimoCambio != null) {
-            ultimoCambio.setFechaHoraFin(fechaCambio);
-        }
-        crearNuevoCE(fechaCambio, null, nuevoEstado);
-        setEstado(nuevoEstado);
-    }
-
-
-    public CambioEstado buscarCEActual() {
-        if (cambiosEstado.isEmpty()) return null;
-        CambioEstado ultimoCambio = cambiosEstado.get(cambiosEstado.size() - 1);
-        return ultimoCambio.sosActual() ? ultimoCambio : null;
-    }
-
-    public void crearNuevoCE(LocalDateTime fechaCambio, LocalDateTime fechaFin, Estado estado) {
-         CambioEstado nuevoCambio = new CambioEstado(fechaCambio, fechaFin, estado);
-        cambiosEstado.add(nuevoCambio);
     }
 
     public Map<String, String> getACO() {
@@ -113,12 +128,10 @@ public class EventoSismico {
         return datos;
     }
 
-
-
     public Map<SerieTemporal, EstacionSismologica> getSeriesPorEstacion() {
         Map<SerieTemporal, EstacionSismologica> resultado = new HashMap<>();
         for (SerieTemporal serie : seriesTemporales) {
-            Sismografo sismografo = (Sismografo) serie.getMuestrasSismicas();  // ✅ ← este método debe estar en SerieTemporal
+            Sismografo sismografo = (Sismografo) serie.getMuestrasSismicas();
             if (sismografo != null) {
                 resultado.put(serie, sismografo.getEstacionSismologica());
             }
@@ -126,68 +139,52 @@ public class EventoSismico {
         return resultado;
     }
 
+    @Override
+    public String toString() {
+        String fecha = fechaHoraOcurrencia != null ? fechaHoraOcurrencia.toString() : "-";
+        String epicentro = (latitudEpicentro != null ? latitudEpicentro : "-") + ", " + (longitudEpicentro != null ? longitudEpicentro : "-");
+        String hipocentro = (latitudHipocentro != null ? latitudHipocentro : "-") + ", " + (longitudHipocentro != null ? longitudHipocentro : "-");
+        String magnitud = String.valueOf(valorMagnitud);
+        String estadoNombre = (estado != null && estado.getNombre() != null) ? estado.getNombre() : "-";
+        String clasif = (clasificacionSismo != null && clasificacionSismo.getNombre() != null) ? clasificacionSismo.getNombre() : "-";
+        String alcance = (alcanceSismo != null && alcanceSismo.getNombre() != null) ? alcanceSismo.getNombre() : "-";
+        String origen = (origenGeneracion != null && origenGeneracion.getNombre() != null) ? origenGeneracion.getNombre() : "-";
+        int seriesCount = (seriesTemporales != null) ? seriesTemporales.size() : 0;
 
-    public void confirmar(Estado estadoConfirmado, LocalDateTime fechaCambio) {
-        System.out.println("🔎 Buscando cambio de estado actual...");
-        CambioEstado ultimoCambio = buscarCEActual();
-        if (ultimoCambio != null) {
-            ultimoCambio.setFechaHoraFin(fechaCambio);
-            System.out.println("⏱ Cambio de estado actual cerrado");
+        // Información del cambio de estado actual (si existe)
+        CambioEstadoES cambioActual = getCambioEstadoActual();
+        String cambioInfo = "-";
+        if (cambioActual != null) {
+            String desde = cambioActual.getFechaHoraInicio() != null ? cambioActual.getFechaHoraInicio().toString() : "-";
+            Empleado resp = cambioActual.getResponsable();
+            String responsableStr = "-";
+            if (resp != null) {
+                String nom = resp.getNombre() != null ? resp.getNombre() : "";
+                String ape = resp.getApellido() != null ? resp.getApellido() : "";
+                responsableStr = (nom + " " + ape).trim();
+                if (responsableStr.isEmpty()) responsableStr = "-";
+            }
+            String estadoCambio = (cambioActual.getEstado() != null && cambioActual.getEstado().getNombre() != null) ? cambioActual.getEstado().getNombre() : "-";
+            cambioInfo = String.format("Estado: %s; desde: %s; responsable: %s", estadoCambio, desde, responsableStr);
         }
 
-        crearNuevoCE(fechaCambio, null, estadoConfirmado);
-        System.out.println("🆕 Nuevo cambio de estado creado");
+        StringBuilder sb = new StringBuilder();
+        sb.append("+---------------------------------------------------------------+\n");
+        sb.append(String.format("| %-30s | %-27s |\n", "Campo", "Valor"));
+        sb.append("+---------------------------------------------------------------+\n");
+        sb.append(String.format("| %-30s | %-27s |\n", "Fecha ocurrencia", fecha));
+        sb.append(String.format("| %-30s | %-27s |\n", "Epicentro (lat,lon)", epicentro));
+        sb.append(String.format("| %-30s | %-27s |\n", "Hipocentro (lat,lon)", hipocentro));
+        sb.append(String.format("| %-30s | %-27s |\n", "Magnitud", magnitud));
+        sb.append(String.format("| %-30s | %-27s |\n", "Estado actual", estadoNombre));
+        // Nueva fila: detalle del cambio de estado actual
+        sb.append(String.format("| %-30s | %-27s |\n", "Cambio estado actual", cambioInfo));
+        sb.append(String.format("| %-30s | %-27s |\n", "Clasificacion", clasif));
+        sb.append(String.format("| %-30s | %-27s |\n", "Alcance", alcance));
+        sb.append(String.format("| %-30s | %-27s |\n", "Origen de generacion", origen));
+        sb.append(String.format("| %-30s | %-27s |\n", "Series temporales (#)", String.valueOf(seriesCount)));
+        sb.append("+---------------------------------------------------------------+\n");
 
-        setEstado(estadoConfirmado);
-        System.out.println("🆕 Estado seteado");
-
-        System.out.println("✔ Evento confirmado a las " + fechaCambio);
-    }
-
-    public void derivar(Estado estadoDerivar, LocalDateTime fechaCambio) {
-        System.out.println("🔎 Buscando cambio de estado actual...");
-        CambioEstado ultimoCambio = buscarCEActual();
-        if (ultimoCambio != null) {
-            ultimoCambio.setFechaHoraFin(fechaCambio);
-            System.out.println("⏱ Cambio de estado actual cerrado");
-        }
-
-        crearNuevoCE(fechaCambio, null, estadoDerivar);
-        System.out.println("🆕 Nuevo cambio de estado creado");
-
-        setEstado(estadoDerivar);
-        System.out.println("🆕 Estado seteado");
-
-        System.out.println("➡ Evento derivado a experto a las " + fechaCambio);
-    }
-
-    public void rechazar(Estado estadoRechazado, LocalDateTime fechaHoraActual, Empleado responsable) {
-        System.out.println("🔎 Buscando cambio de estado actual...");
-        CambioEstado actual = buscarCEActual();
-        if (actual != null) {
-            actual.setFechaHoraFin(fechaHoraActual);
-            System.out.println("⏱ Cambio de estado actual cerrado");
-        }
-
-        crearNuevoCE(fechaHoraActual, null, estadoRechazado);
-        System.out.println("🆕 Nuevo cambio de estado creado");
-
-        this.fechaHoraRevision = fechaHoraActual;
-        this.responsableRevision = responsable;
-        System.out.println("🕒 FechaHora y Responsable de revision seteados");
-
-        setEstado(estadoRechazado);
-        System.out.println("🆕 Estado seteado");
-
-        System.out.println("❌ Evento rechazado a las " + fechaHoraActual);
-    }
-
-    public void validarExistencias(EventoSismico evento) {
-        if (evento.getValorMagnitud() == 0
-                || evento.getAlcanceSismo() == null
-                || evento.getOrigenGeneracion() == null) {
-            System.out.println("⚠ Faltan datos esenciales.");
-            return;
-        }
+        return sb.toString();
     }
 }

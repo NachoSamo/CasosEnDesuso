@@ -1,4 +1,4 @@
-package casosDeUso;
+package imagenSismograma;
 
 import entidades.EstacionSismologica;
 import entidades.EventoSismico;

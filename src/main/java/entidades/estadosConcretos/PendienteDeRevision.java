@@ -1,11 +1,11 @@
 package entidades.estadosConcretos;
 
 import entidades.Empleado;
-import entidades.Estado;
+import entidades.estadoPadreAbstracto.EstadoES;
 
 import java.time.LocalDateTime;
 
-public class PendienteDeRevision extends Estado {
+public class PendienteDeRevision extends EstadoES {
     public void revisar(LocalDateTime fechahora, Empleado empleado) {
 
     }

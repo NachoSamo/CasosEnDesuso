@@ -1,6 +1,6 @@
 package entidades.estadosConcretos;
 
-import entidades.Estado;
+import entidades.estadoPadreAbstracto.EstadoES;
 
-public class SinRevision extends Estado {
+public class SinRevision extends EstadoES {
 }

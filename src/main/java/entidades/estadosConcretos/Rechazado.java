@@ -1,6 +1,9 @@
 package entidades.estadosConcretos;
 
-import entidades.Estado;
+import entidades.estadoPadreAbstracto.EstadoES;
 
-public class Rechazado extends Estado {
+public class Rechazado extends EstadoES {
+    public Rechazado() {
+        super("Rechazado");
+    }
 }

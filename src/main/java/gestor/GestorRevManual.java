@@ -1,15 +1,16 @@
 package gestor;
 
 import boundary.PantallaRegistrarResultadoDeRevManual;
-import casosDeUso.GenerarSismograma;
+import imagenSismograma.GenerarSismograma;
 import entidades.*;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GestorRevManual {
 
@@ -19,282 +20,123 @@ public class GestorRevManual {
     private EventoSismico eventoSeleccionado;
     private final GenerarSismograma controladorSismograma = new GenerarSismograma();
     private PantallaRegistrarResultadoDeRevManual boundaryRef;
-    private List<Estado> estadosDisponibles;
 
     public void setBoundary(PantallaRegistrarResultadoDeRevManual boundary) {
         this.boundaryRef = boundary;
     }
 
-
     public GestorRevManual() {
-        estadosDisponibles = MockDatos.obtenerEstadosMock();
         empleadosSistema = MockDatos.obtenerEmpleadosMock();
         eventosSimulados = MockDatos.obtenerEventosMock();
     }
 
-
-
-    // ✅ Paso inicial del caso de uso
     public List<EventoSismico> registrarResultadoDeRevMan(Sesion sesionActiva) {
         this.empleadoResponsable = buscarEmpleado(sesionActiva);
-        List<EventoSismico> eventos = buscarESSinRevisar(); // Buscar sin ordenar
-        List<EventoSismico> ordenados = ordenarESPorFechaHoraOcurrencia(eventos); // Devuelvo lista de eventos
-        //        return pantallaRegistrarResultadoDeRevManual.mostrarESeventosOrdenados();
+        List<EventoSismico> eventos = buscarESAutodetectados();
+        List<EventoSismico> ordenados = ordenarESPorFechaHoraOcurrencia(eventos);
 
         if (boundaryRef != null) {
             boundaryRef.mostrarES(ordenados);
-            boundaryRef.solicitarSeleccionES();
         }
         return ordenados;
     }
 
     public Empleado buscarEmpleado(Sesion sesionActiva) {
-        if (sesionActiva == null) {
-            System.out.println("⚠ Sesión activa no recibida.");
-            return null;
-        }
-
+        if (sesionActiva == null) return null;
         Usuario usuarioSesion = sesionActiva.getUsuario();
-        System.out.println("🔍 Buscando empleado para usuario: " + usuarioSesion.getUsername());
-
         for (Empleado emp : empleadosSistema) {
-            System.out.println("🔁 Comparando con: " + emp.getUsuario().getUsername());
             if (emp.esTuUsuario(usuarioSesion)) {
-                System.out.println("✅ Empleado encontrado: " + emp.getNombre());
                 return emp;
             }
         }
-
-        System.out.println("❌ Empleado no encontrado.");
         return null;
     }
 
-    public List<EventoSismico> buscarESSinRevisar() {
-        List<EventoSismico> sinRevisar = eventosSimulados.stream()
-                .filter(EventoSismico::soySinRevisar)
-                .toList();
-
-        sinRevisar.forEach(ev -> ev.getDatos()); // Forzar ejecución del getDatos
-        return sinRevisar; // Solo devolver la lista ordenada
+    public List<EventoSismico> buscarESAutodetectados() {
+        return eventosSimulados.stream()
+                .filter(EventoSismico::soyAutoDetectado)
+                .collect(Collectors.toList());
     }
-
 
     public List<EventoSismico> ordenarESPorFechaHoraOcurrencia(List<EventoSismico> eventos) {
         return eventos.stream()
                 .sorted(Comparator.comparing(EventoSismico::getFechaHoraOcurrencia))
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    // ✅ Tomar evento seleccionado desde la pantalla
     public void tomarSeleccionES(EventoSismico evento) {
         this.eventoSeleccionado = evento;
-        Estado estadoEnRevision = buscarESEnRevisión();
         LocalDateTime fechaActual = getFechaHoraActual();
-        revisar(evento, estadoEnRevision, fechaActual);
-        Map<String, String> detalles = buscarDetallesES();
+        revisar(evento, fechaActual);
+        buscarDetallesES();
     }
-
-    public Estado buscarESEnRevisión() {
-        for (Estado estado : estadosDisponibles) {
-            if (estado != null
-                    && estado.esEnRevision()
-                    && estado.esAmbitoEvento()) {
-                return estado;
-            }
-        }
-        return null; // Si no lo encuentra
-    }
-
 
     public LocalDateTime getFechaHoraActual() {
         return LocalDateTime.now();
     }
 
-    public void revisar(EventoSismico ev, Estado estadoEnRevision, LocalDateTime fechaActual) {
-        if (estadoEnRevision != null && ev != null) {
-            ev.revisar(estadoEnRevision, fechaActual);
+    public void revisar(EventoSismico ev, LocalDateTime fechaActual) {
+        if (ev != null) {
+            ev.revisar(fechaActual, this.empleadoResponsable);
         }
     }
-
 
     public Map<String, String> buscarDetallesES() {
         if (eventoSeleccionado == null) return Collections.emptyMap();
         Map<String, String> aco = eventoSeleccionado.getACO();
-        Map<SerieTemporal, List<String>> datosMuestrasSismicas = eventoSeleccionado.getDatosMuestrasSismicas();
-//        ordenarPorEstacionSismologica()
-//        geneararSismograma()
         return boundaryRef.mostrarDetalleES(aco);
     }
 
-
-
-    // ✅ Combinar serie ↔ estación ↔ detalles
-    public Map<String, List<String>> ordenarPorEstacionSismologica(
-            Map<SerieTemporal, List<String>> datosSeries,
-            Map<SerieTemporal, EstacionSismologica> mapaSeriesEstacion) {
-
-        Map<String, List<String>> datosPorEstacion = new TreeMap<>();
-
-        for (Map.Entry<SerieTemporal, List<String>> entry : datosSeries.entrySet()) {
-            SerieTemporal serie = entry.getKey();
-            List<String> muestras = entry.getValue();
-            EstacionSismologica estacion = mapaSeriesEstacion.get(serie);
-
-            if (estacion != null) {
-                String nombreEstacion = estacion.getNombre();
-                datosPorEstacion.computeIfAbsent(nombreEstacion, k -> new ArrayList<>()).addAll(muestras);
-            }
-        }
-
-        return datosPorEstacion;
-    }
-
-
-
-    // ✅ Generar imagen sismograma con detalle de estaciones
     public Image generarSismograma(EventoSismico evento) {
         if (evento == null) return null;
-
-        Map<SerieTemporal, List<String>> datosMuestras = evento.getDatosMuestrasSismicas();
-        Map<SerieTemporal, EstacionSismologica> estaciones = evento.getSeriesPorEstacion();
-
-        System.out.println("📊 Detalles de muestras por estación:");
-        for (SerieTemporal serie : datosMuestras.keySet()) {
-            EstacionSismologica estacion = estaciones.get(serie);
-            System.out.println("🛰 Estación: " + (estacion != null ? estacion.getNombre() : "Desconocida"));
-            for (String detalle : datosMuestras.get(serie)) {
-                System.out.println("   - " + detalle);
-            }
-        }
-
         return controladorSismograma.ejecutar(evento);
     }
 
-
-
-
-
-
-    public void tomarAccion(String accion) {
-        EventoSismico evento = this.eventoSeleccionado;
-        if (evento == null || accion == null) return;
-
-        evento.validarExistencias(this.eventoSeleccionado);
-
+    // --- METODO CLAVE MODIFICADO ---
+    public boolean tomarAccion(String accion) {
+        if (eventoSeleccionado == null || accion == null) return false;
         LocalDateTime fechaActual = this.getFechaHoraActual();
 
-        switch (accion.toLowerCase()) {
-            case "confirmar" -> {
-                Estado estadoConfirmado = buscarConfirmado(estadosDisponibles);
-                confirmar(estadoConfirmado, fechaActual);
-                finCU("Evento confirmado correctamente.");
+        try {
+            switch (accion.toLowerCase()) {
+                case "confirmar" -> {
+                    eventoSeleccionado.confirmar(fechaActual, empleadoResponsable);
+                    String estadoNombre = eventoSeleccionado.getEstado() != null ? eventoSeleccionado.getEstado().getNombre() : "UNKNOWN";
+                    String msg = "Estado del evento sismico: " + eventoSeleccionado.toString() + " ha sido cambiado a " + estadoNombre;
+                    System.out.println(msg);
+                }
+                case "rechazar" -> {
+                    eventoSeleccionado.rechazar(fechaActual, empleadoResponsable);
+                    String estadoNombre = eventoSeleccionado.getEstado() != null ? eventoSeleccionado.getEstado().getNombre() : "UNKNOWN";
+                    String msg = "Estado del evento sismico: " + eventoSeleccionado.toString() + " ha sido cambiado a " + estadoNombre;
+                    System.out.println(msg);
+                }
+                case "derivar" -> {
+                    eventoSeleccionado.derivar(fechaActual, empleadoResponsable);
+                    String estadoNombre = eventoSeleccionado.getEstado() != null ? eventoSeleccionado.getEstado().getNombre() : "UNKNOWN";
+                    String msg = "Estado del evento sismico: " + eventoSeleccionado.toString() + " ha sido cambiado a " + estadoNombre;
+                    System.out.println(msg);
+                }
+                default -> {
+                    System.out.println("Accion no reconocida: " + accion);
+                    return false; // Indica que la acción no se encontró
+                }
             }
-            case "rechazar" -> {
-                Estado estadoRechazado = buscarRechazado(estadosDisponibles);
-                rechazar(estadoRechazado, fechaActual);
-                finCU("Evento Rechazado correctamente.");
-            }
-            case "derivar" -> {
-                Estado estadoDerivado = buscarDerivado(estadosDisponibles);
-                derivar(estadoDerivado, fechaActual);
-                finCU("Evento derivado a Experto.");
-
-            }
-            default -> System.out.println("⚠ Acción no reconocida: " + accion);
+            return true; // Indica éxito
+        } catch (UnsupportedOperationException | IllegalStateException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Operacion Invalida");
+            alert.setHeaderText("La accion no se puede realizar.");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+            return false; // Indica fracaso
         }
     }
-
-
-    // ✅ Buscar estado "Rechazado"
-    public Estado buscarRechazado(List<Estado> estados) {
-        for (Estado estado : estados) {
-            if (estado.esAmbitoEvento() && estado.esRechazado()) {
-                return estado;
-            }
-        }
-        return null;
-    }
-
-
-    public Estado buscarConfirmado(List<Estado> estados) {
-        for (Estado estado : estados) {
-            if ("Confirmado".equals(estado.getNombreEstado()) && "Evento".equals(estado.getAmbito())) {
-                return estado;
-            }
-        }
-        return new Estado("Confirmado", "Evento"); // Fallback
-    }
-
-    public Estado buscarDerivado(List<Estado> estados) {
-        for (Estado estado : estados) {
-            if ("Derivado".equals(estado.getNombreEstado()) && "Evento".equals(estado.getAmbito())) {
-                return estado;
-            }
-        }
-        return new Estado("Derivado", "Evento"); // Fallback
-    }
-
-
-
-    public void confirmar(Estado estadoConfirmado, LocalDateTime fechaActual) {
-        EventoSismico ev = this.eventoSeleccionado;
-        Empleado empleado = empleadoResponsable;
-        ev.confirmar(estadoConfirmado, fechaActual);
-        System.out.println("✔ Evento confirmado");
-    }
-
-    public void rechazar(Estado estadoRechazado, LocalDateTime fechaActual) {
-        EventoSismico ev = this.eventoSeleccionado;
-        Empleado empleado = empleadoResponsable;
-        this.eventoSeleccionado.rechazar(estadoRechazado, fechaActual, empleado);
-        System.out.println("✖ Evento rechazado");
-    }
-
-
-
-
-
-
-    public void derivar(Estado estadoDerivado, LocalDateTime fechaActual) {
-        EventoSismico ev = this.eventoSeleccionado;
-        Empleado empleado = empleadoResponsable;
-        ev.derivar(estadoDerivado, fechaActual);
-        System.out.println("➡ Evento derivado a experto");
-    }
-
-
-
-
-
-    public void cancelar(EventoSismico ev) {
-        if (ev == null) return;
-
-        // Obtener el último cambio de estado anterior
-        List<CambioEstado> historial = ev.getCambiosEstado();
-        if (historial.size() < 2) {
-            System.out.println("⚠ No hay estado anterior para revertir.");
-            return;
-        }
-
-        CambioEstado cambioAnterior = historial.get(historial.size() - 2);
-        Estado estadoAnterior = cambioAnterior.getEstado();
-
-        // Cerrar el cambio actual
-        CambioEstado cambioActual = historial.get(historial.size() - 1);
-        cambioActual.setFechaHoraFin(LocalDateTime.now());
-
-        // Crear nuevo cambio con el estado anterior
-        ev.revisar(estadoAnterior, LocalDateTime.now());
-        System.out.println("↩ Evento restaurado a estado anterior: " + estadoAnterior.getNombreEstado());
-    }
-
-
-
 
     public void finCU(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Finalización de Caso de Uso");
-        alert.setHeaderText("Revisión Finalizada");
+        alert.setTitle("Finalizacion de Caso de Uso");
+        alert.setHeaderText("Revision Finalizada");
         alert.setContentText(mensaje);
         alert.showAndWait();
 
@@ -304,7 +146,4 @@ public class GestorRevManual {
                 .orElse(null);
         if (stage != null) stage.close();
     }
-
-
-
 }

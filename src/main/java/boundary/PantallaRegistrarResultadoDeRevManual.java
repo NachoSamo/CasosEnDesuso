@@ -10,9 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.List;
@@ -25,7 +23,6 @@ public class PantallaRegistrarResultadoDeRevManual {
     @FXML private TableColumn<EventoSismico, String> colEpicentro;
     @FXML private TableColumn<EventoSismico, String> colHipocentro;
     @FXML private TableColumn<EventoSismico, Double> colMagnitud;
-    @FXML private StackPane contenedorCentral;
     @FXML private VBox vistaInicial;
     @FXML private VBox vistaCU;
     @FXML private TextField txtEventoSeleccionado;
@@ -33,7 +30,6 @@ public class PantallaRegistrarResultadoDeRevManual {
     @FXML private TextField txtClasificacion;
     @FXML private TextField txtOrigen;
     @FXML private Label txtusername;
-    @FXML private Button btnCancelar;
     @FXML private ImageView imagenSismograma;
     @FXML private HBox seccionBottom;
 
@@ -45,6 +41,15 @@ public class PantallaRegistrarResultadoDeRevManual {
         this.sesionActiva = sesion;
     }
 
+    // Este método es llamado automáticamente por JavaFX después de cargar el FXML.
+    // Lo usamos para configuraciones iniciales que no dependen de la acción del usuario.
+    @FXML
+    public void initialize() {
+        controladorCU.setBoundary(this);
+    }
+
+    // Este método es llamado por el botón "Registrar Resultado".
+    // Ahora contiene toda la lógica de preparación de la pantalla.
     @FXML
     private void iniciarCU() {
         vistaInicial.setVisible(false);
@@ -55,29 +60,22 @@ public class PantallaRegistrarResultadoDeRevManual {
         seccionBottom.setVisible(true);
         seccionBottom.setManaged(true);
 
-        initialize();
-    }
-
-    @FXML
-    public void initialize() {
-        List<Sesion> sesiones = MockDatos.obtenerSesionesMock();
-        Sesion sesionActiva = Sesion.obtenerSesionActiva(sesiones);
-        controladorCU.setBoundary(this);
-        controladorCU.registrarResultadoDeRevMan(sesionActiva);
-        habilitarPantalla(sesionActiva);
-    }
-
-    @FXML
-    public void habilitarPantalla(Sesion sesionActiva) {
+        // Configurar la tabla una sola vez
         colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrenciaTexto"));
         colEpicentro.setCellValueFactory(new PropertyValueFactory<>("coordEpicentro"));
         colHipocentro.setCellValueFactory(new PropertyValueFactory<>("coordHipocentro"));
         colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
 
-        List<EventoSismico> eventos = controladorCU.registrarResultadoDeRevMan(sesionActiva);
-        if (txtusername != null && controladorCU.buscarEmpleado(sesionActiva) != null) {
-            txtusername.setText(controladorCU.buscarEmpleado(sesionActiva).getUsuario().getUsername());
+        // Obtener sesión y cargar datos iniciales
+        List<Sesion> sesiones = MockDatos.obtenerSesionesMock();
+        this.sesionActiva = Sesion.obtenerSesionActiva(sesiones);
+
+        if (txtusername != null && controladorCU.buscarEmpleado(this.sesionActiva) != null) {
+            txtusername.setText(controladorCU.buscarEmpleado(this.sesionActiva).getUsuario().getUsername());
         }
+
+        // Llamada UNICA al gestor para poblar la tabla
+        controladorCU.registrarResultadoDeRevMan(this.sesionActiva);
     }
 
     public void mostrarES(List<EventoSismico> eventos) {
@@ -85,31 +83,18 @@ public class PantallaRegistrarResultadoDeRevManual {
     }
 
     @FXML
-    public void solicitarSeleccionES() {
-        eventoSeleccionado = tablaEventos.getSelectionModel().getSelectedItem();
-        if (eventoSeleccionado != null) {
-            tomarSeleccionES();
-        }
-    }
-
-    @FXML
     private void tomarSeleccionES() {
+        eventoSeleccionado = tablaEventos.getSelectionModel().getSelectedItem();
         if (eventoSeleccionado == null) {
-            eventoSeleccionado = tablaEventos.getSelectionModel().getSelectedItem();
-            if (eventoSeleccionado == null) {
-                mostrarAlerta("⚠ Debe seleccionar un evento sísmico antes de continuar.");
-                return;
-            }
+            // No mostrar alerta si solo se está haciendo clic en la tabla,
+            // solo cuando se intenta realizar una acción sin selección.
+            return;
         }
 
         tablaEventos.setDisable(true);
-
-        // 🟢 Esta línea es la clave
         controladorCU.tomarSeleccionES(eventoSeleccionado);
-
         mostrarSismograma();
     }
-
 
     public Map<String, String> mostrarDetalleES(Map<String, String> aco) {
         txtEventoSeleccionado.setText(eventoSeleccionado.getFechaHoraOcurrencia().toString());
@@ -124,95 +109,67 @@ public class PantallaRegistrarResultadoDeRevManual {
         if (sismograma != null) {
             imagenSismograma.setImage(sismograma);
             imagenSismograma.setVisible(true);
-            System.out.println("🖼 Imagen del sismograma generada correctamente.");
         } else {
-            System.out.println("⚠ No se pudo generar el sismograma para el evento seleccionado.");
+            System.out.println("No se pudo generar el sismograma para el evento seleccionado.");
         }
     }
 
-    @FXML
-    private void confirmarEvento() {
-        tomarAccion("confirmar");
-    }
-
-    @FXML
-    private void rechazarEvento() {
-        tomarAccion("rechazar");
-    }
-
-    @FXML
-    private void derivarEvento() {
-        tomarAccion("derivar");
-    }
+    @FXML private void confirmarEvento() { tomarAccion("confirmar"); }
+    @FXML private void rechazarEvento() { tomarAccion("rechazar"); }
+    @FXML private void derivarEvento() { tomarAccion("derivar"); }
 
     @FXML
     private void cancelarAccion() {
-        tomarAccion("cancelar");
+        refrescarVista();
+        mostrarAlerta("Operacion cancelada. Puede seleccionar otro evento.");
     }
 
-
-    public void habOptMapa() {
-        System.out.println("🗺 Se habilitó la opción de ver el mapa sísmico.");
-        // Aquí podrías agregar lógica para mostrar un mapa o realizar alguna acción relacionada.
-    }
-
-
-    /**
-     * Método centralizado para manejar las acciones de los botones
-     */
     private void tomarAccion(String accion) {
+        if (eventoSeleccionado == null) {
+            mostrarAlerta("No hay ningun evento seleccionado para procesar.");
+            return;
+        }
 
-        switch (accion.toLowerCase()) {
-            case "confirmar" -> {
-                controladorCU.tomarAccion("confirmar");
-            }
-            case "rechazar" -> {
-                controladorCU.tomarAccion("rechazar");
-            }
-            case "derivar" -> {
-                controladorCU.tomarAccion("derivar");
-            }
-            case "cancelar" -> {
-                controladorCU.cancelar(eventoSeleccionado);
-                controladorCU.finCU("Cancelacion de Revision de evento");
-                mostrarDialogoYSalir("Evento restaurado al estado anterior.");
+        boolean exito = controladorCU.tomarAccion(accion);
 
-            }
-            default -> mostrarAlerta("Acción no reconocida.");
+        if (exito) {
+            mostrarAlerta("El estado del evento sismico ha sido modificado con éxito.");
+            refrescarVista();
         }
     }
 
+    private void refrescarVista() {
+        txtEventoSeleccionado.clear();
+        txtAlcance.clear();
+        txtClasificacion.clear();
+        txtOrigen.clear();
+        imagenSismograma.setImage(null);
 
-    private void mostrarDialogoYSalir(String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Finalización de Caso de Uso");
-        alert.setHeaderText("Revisión Finalizada");
-        alert.setContentText(mensaje);
-        alert.showAndWait();
-        Stage stage = (Stage) tablaEventos.getScene().getWindow();
-        stage.close();
+        tablaEventos.setDisable(false);
+        tablaEventos.getSelectionModel().clearSelection();
+        this.eventoSeleccionado = null;
+
+        // Recargar la lista de eventos pendientes llamando al gestor
+        controladorCU.registrarResultadoDeRevMan(this.sesionActiva);
     }
 
     private void mostrarAlerta(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Revisión Manual");
+        alert.setTitle("Revision Manual");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
 
-    @FXML
-    private void tomarOptMapaSismico() {
-        System.out.println("🗺 Se seleccionó la opción de ver el mapa sísmico.");
-    }
+    // --- METODOS FALTANTES REINCORPORADOS ---
 
     @FXML
-    private void habOptModificarDatos() {
-        System.out.println("📝 Se seleccionó la opción de modificar datos.");
+    private void tomarOptMapaSismico() {
+        System.out.println("Se selecciono la opcion de ver el mapa sismico.");
     }
 
     @FXML
     private void tomarOptModificarDatos() {
-        habOptModificarDatos();
+        System.out.println("Se selecciono la opcion de modificar datos.");
     }
 }

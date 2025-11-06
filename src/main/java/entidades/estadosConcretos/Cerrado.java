@@ -1,6 +1,6 @@
 package entidades.estadosConcretos;
 
-import entidades.Estado;
+import entidades.estadoPadreAbstracto.EstadoES;
 
-public class Cerrado extends Estado {
+public class Cerrado extends EstadoES {
 }
