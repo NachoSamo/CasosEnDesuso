@@ -41,37 +41,54 @@ public class PantallaRegistrarResultadoDeRevManual {
     @FXML
     public void initialize() {
         controladorCU.setBoundary(this);
-        // Inicialización de columnas movida aquí para que esté disponible si se llama a mostrarES antes de iniciarCU
-        colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrenciaTexto"));
-        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("coordEpicentro"));
-        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("coordHipocentro"));
-        colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
     }
 
     @FXML
     private void iniciarCU() {
+        // 1. Mostrar las vistas correctas
         vistaInicial.setVisible(false);
         vistaInicial.setManaged(false);
-
         vistaCU.setVisible(true);
         vistaCU.setManaged(true);
         seccionBottom.setVisible(true);
         seccionBottom.setManaged(true);
 
-        // --- SIMULACIÓN DE SESIÓN (Se mantiene la lógica original) ---
+        // --- CAMBIO CLAVE: CONFIGURACIÓN DE COLUMNAS CON LAMBDAS ---
+        // Este es el método moderno y a prueba de fallos.
+
+        colFechaHora.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getFechaHoraOcurrenciaTexto())
+        );
+        colEpicentro.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getCoordEpicentro())
+        );
+        colHipocentro.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getCoordHipocentro())
+        );
+        colMagnitud.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleDoubleProperty(cellData.getValue().getValorMagnitud()).asObject()
+        );
+
+        // 3. Simular la sesión activa
         Usuario usuarioLogueado = new Usuario("lgomez", null);
         this.sesionActiva = new Sesion(LocalDateTime.now(), null, usuarioLogueado);
 
-        // Se verifica que el gestor encuentre el empleado para actualizar la etiqueta
-        if (txtusername != null && controladorCU.buscarEmpleado(this.sesionActiva) != null) {
-            txtusername.setText(controladorCU.buscarEmpleado(this.sesionActiva).getUsuario().getUsername());
+        // 4. Actualizar la UI con la información de la sesión
+        if (txtusername != null) {
+            txtusername.setText(usuarioLogueado.getUsername());
         }
 
-        // El gestor obtiene los datos de la base de datos.
+        // 5. Pedir al gestor que cargue los datos iniciales desde la BD
         controladorCU.registrarResultadoDeRevMan(this.sesionActiva);
     }
 
+    // --- VERIFICACIÓN ADICIONAL ---
+    // Añade este print para estar 100% seguro de que los datos llegan.
     public void mostrarES(List<EventoSismico> eventos) {
+        System.out.println("Numero de eventos recibidos para mostrar en la tabla: " + eventos.size());
+        if (!eventos.isEmpty()) {
+            System.out.println("Primer evento: " + eventos.get(0).getFechaHoraOcurrenciaTexto());
+        }
         tablaEventos.setItems(FXCollections.observableArrayList(eventos));
     }
 
@@ -89,7 +106,6 @@ public class PantallaRegistrarResultadoDeRevManual {
 
     public Map<String, String> mostrarDetalleES(Map<String, String> aco) {
         txtEventoSeleccionado.setText(eventoSeleccionado.getFechaHoraOcurrencia().toString());
-        // Se asume que los objetos embeddable no son nulos
         txtAlcance.setText(aco.getOrDefault("alcance", ""));
         txtClasificacion.setText(aco.getOrDefault("clasificacion", ""));
         txtOrigen.setText(aco.getOrDefault("origen", ""));
@@ -103,7 +119,8 @@ public class PantallaRegistrarResultadoDeRevManual {
             imagenSismograma.setVisible(true);
         } else {
             System.out.println("No se pudo generar el sismograma para el evento seleccionado.");
-            imagenSismograma.setVisible(false); // Ocultar si no hay imagen
+            imagenSismograma.setImage(null);
+            imagenSismograma.setVisible(false);
         }
     }
 
@@ -137,35 +154,28 @@ public class PantallaRegistrarResultadoDeRevManual {
         txtClasificacion.clear();
         txtOrigen.clear();
         imagenSismograma.setImage(null);
-        imagenSismograma.setVisible(false); // Asegurar que se oculte
+        imagenSismograma.setVisible(false);
 
         tablaEventos.setDisable(false);
         tablaEventos.getSelectionModel().clearSelection();
         this.eventoSeleccionado = null;
 
-        // Recargar la lista de eventos pendientes llamando al gestor,
-        // quien consultará la base de datos.
+        // Recargar la lista de eventos pendientes llamando al gestor.
         controladorCU.registrarResultadoDeRevMan(this.sesionActiva);
     }
 
-    /**
-     * Muestra una alerta con el estilo de easysmos.
-     * Se ajusta el título y se carga el CSS para estilizar el DialogPane.
-     */
     private void mostrarAlerta(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("easysmos - Revisión Manual");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
 
-        // --- INYECCIÓN DE ESTILO CSS para la alerta ---
         try {
             DialogPane dialogPane = alert.getDialogPane();
-            // Carga el CSS desde resources/css/easysmos.css
             dialogPane.getStylesheets().add(getClass().getResource("/css/easysmos.css").toExternalForm());
-            dialogPane.getStyleClass().add("card-panel"); // Usar el estilo de card para la alerta
+            // dialogPanegetStyleClass().add("card-panel");
         } catch (Exception e) {
-            System.err.println("Error al cargar el CSS para la alerta: " + e.getMessage());
+            // Ignorar si el CSS no se encuentra, no es crítico.
         }
 
         alert.showAndWait();

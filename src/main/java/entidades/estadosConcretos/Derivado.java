@@ -20,7 +20,7 @@ public class Derivado extends EstadoES {
         actual.setFechaHoraFin(fh);
 
         EstadoES nuevoEstado = new Confirmado();
-        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, null, resp, nuevoEstado);
+        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, resp, nuevoEstado);
 
         es.agregarCE(nuevoCambio);
         es.setEstado(nuevoEstado);
@@ -37,7 +37,7 @@ public class Derivado extends EstadoES {
         actual.setFechaHoraFin(fh);
 
         EstadoES nuevoEstado = new Rechazado();
-        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, null, resp, nuevoEstado);
+        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, resp, nuevoEstado);
 
         es.agregarCE(nuevoCambio);
         es.setEstado(nuevoEstado);

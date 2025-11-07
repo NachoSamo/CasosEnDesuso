@@ -44,12 +44,25 @@ public class EventoSismico {
     private String estadoActualClassName;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "nombre", column = @Column(name = "clasificacion_nombre")),
+            @AttributeOverride(name = "kmProfundidadDesde", column = @Column(name = "clasificacion_profundidad_desde")),
+            @AttributeOverride(name = "kmProfundidadHasta", column = @Column(name = "clasificacion_profundidad_hasta"))
+    })
     private ClasificacionSismo clasificacionSismo;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "nombre", column = @Column(name = "alcance_nombre")),
+            @AttributeOverride(name = "descripcion", column = @Column(name = "alcance_descripcion"))
+    })
     private AlcanceSismo alcanceSismo;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "nombre", column = @Column(name = "origen_nombre")),
+            @AttributeOverride(name = "descripcion", column = @Column(name = "origen_descripcion"))
+    })
     private OrigenDeGeneracion origenGeneracion;
 
 
@@ -101,10 +114,13 @@ public class EventoSismico {
             this.cambiosEstado = new ArrayList<>();
         }
         this.cambiosEstado.add(nuevoCambio);
-        nuevoCambio.setEventoSismico(this);
+        nuevoCambio.setEventoSismico(this); // Importante para la relación bidireccional
     }
 
     public CambioEstadoES getCambioEstadoActual() {
+        if (this.cambiosEstado == null || this.cambiosEstado.isEmpty()) {
+            return null;
+        }
         return this.cambiosEstado.stream()
                 .filter(CambioEstadoES::esActual)
                 .findFirst()
@@ -193,7 +209,6 @@ public class EventoSismico {
             }
         }
     }
-
     @Override
     public String toString() {
         String fecha = fechaHoraOcurrencia != null ? fechaHoraOcurrencia.toString() : "-";
