@@ -1,0 +1,176 @@
+/*
+ * Archivo CSS para la interfaz de easysmos (Estilo Calmado/Claro)
+ * Paleta de colores:
+ * --color-primary-green: #10B981 (Confirmar / Éxito)
+ * --color-danger-red: #EF4444 (Rechazar / Alerta)
+ * --color-neutral-blue: #60A5FA (Derivar / Secundario)
+ * --color-soft-blue: #EAF8F9 (Fondo de Secciones/Encabezado - Azul muy claro)
+ * --color-background: #FFFFFF (Fondo general y de cards - Blanco)
+ * --color-text-dark: #1E3A8A (Texto principal / Azul Marino)
+ * --color-text-medium: #4B5563 (Texto secundario/Normal)
+ *
+ * CAMBIOS: Más presencia del azul suave en campos y tablas.
+ */
+
+.root {
+    -fx-font-family: "Segoe UI", "Inter", sans-serif;
+    -fx-base: #FFFFFF;
+}
+
+/* ------------------ GENERAL / FONDO ------------------ */
+.background-color {
+    -fx-background-color: #FFFFFF;
+}
+
+.card-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 15px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-color: #EAF8F9; /* Borde muy suave */
+    -fx-border-width: 2px;
+}
+
+/* ------------------ ENCABEZADO ------------------ */
+.header-bar {
+    -fx-background-color: #EAF8F9; /* Azul muy claro */
+    -fx-padding: 10px 20px;
+}
+
+.app-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E3A8A; /* Azul marino */
+}
+
+.username-label {
+    -fx-text-fill: #4B5563; /* Gris oscuro */
+    -fx-font-weight: 500;
+    -fx-font-size: 14px;
+}
+
+/* ------------------ BOTONES ------------------ */
+.button {
+    -fx-text-fill: #4B5563;
+    -fx-font-size: 11pt;
+    -fx-padding: 8px 15px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D5DB; /* Gris de borde suave */
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+    -fx-font-weight: 600;
+    -fx-transition: all 0.2s ease-in-out;
+}
+
+.button:hover {
+    -fx-background-color: #F3F4F6;
+    -fx-scale-y: 1.02;
+}
+
+/* Botón de Confirmar (ACCIÓN PRINCIPAL) -> VERDE */
+.button-primary {
+    -fx-background-color: #10B981; /* Verde */
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #10B981;
+}
+
+.button-primary:hover {
+    -fx-background-color: derive(#10B981, -10%);
+}
+
+/* Botón de Rechazar -> ROJO */
+.button-danger {
+    -fx-background-color: #EF4444; /* Rojo */
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #EF4444;
+}
+
+.button-danger:hover {
+    -fx-background-color: derive(#EF4444, -10%);
+}
+
+/* Botón Secundario (Derivar, etc.) -> AZUL NEUTRO */
+.button-secondary {
+    -fx-background-color: #60A5FA; /* Azul neutro */
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #60A5FA;
+}
+
+.button-secondary:hover {
+    -fx-background-color: derive(#60A5FA, -10%);
+}
+
+/* Botón Cancelar (Acción que revierte) -> GRIS SUAVE */
+.button-cancel {
+    -fx-background-color: #D1D5DB;
+    -fx-text-fill: #4B5563;
+    -fx-border-color: #D1D5DB;
+}
+
+.button-cancel:hover {
+    -fx-background-color: derive(#D1D5DB, -10%);
+}
+
+
+/* ------------------ INPUTS Y ETIQUETAS ------------------ */
+.label-main-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E3A8A; /* Azul Marino */
+}
+
+.label-subtitle {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E3A8A; /* Azul Marino */
+}
+
+.color-text {
+    -fx-text-fill: #4B5563;
+}
+
+.text-field {
+    -fx-background-color: #EAF8F9; /* MÁS AZUL: Fondo de campo en azul suave */
+    -fx-border-color: #D1D5DB;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #1E3A8A; /* Texto en Azul Marino */
+    -fx-padding: 5px;
+}
+
+/* ------------------ TABLA ------------------ */
+.table-view {
+    -fx-background-color: #EAF8F9; /* MÁS AZUL: Fondo de la tabla en azul suave */
+    -fx-border-color: #EAF8F9;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #D1EAF1; /* Un toque de azul más saturado para el header */
+    -fx-background-radius: 5px 5px 0 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #1E3A8A; /* Azul marino */
+    -fx-font-weight: bold;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: rgba(96, 165, 250, 0.2); /* Transparencia del azul neutro */
+    -fx-text-fill: #1E3A8A;
+}
+
+/* Asegurar que las filas no seleccionadas se vean claras sobre el fondo azul suave */
+.table-row-cell {
+    -fx-background-color: transparent; /* Permite que el color de fondo de la tabla se muestre */
+}
+
+.table-row-cell:odd {
+    -fx-background-color: rgba(255, 255, 255, 0.5); /* Blanco ligeramente transparente para alternar */
+}

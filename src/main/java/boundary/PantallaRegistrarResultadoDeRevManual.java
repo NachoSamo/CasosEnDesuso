@@ -41,6 +41,11 @@ public class PantallaRegistrarResultadoDeRevManual {
     @FXML
     public void initialize() {
         controladorCU.setBoundary(this);
+        // Inicialización de columnas movida aquí para que esté disponible si se llama a mostrarES antes de iniciarCU
+        colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrenciaTexto"));
+        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("coordEpicentro"));
+        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("coordHipocentro"));
+        colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
     }
 
     @FXML
@@ -53,23 +58,16 @@ public class PantallaRegistrarResultadoDeRevManual {
         seccionBottom.setVisible(true);
         seccionBottom.setManaged(true);
 
-        colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrenciaTexto"));
-        colEpicentro.setCellValueFactory(new PropertyValueFactory<>("coordEpicentro"));
-        colHipocentro.setCellValueFactory(new PropertyValueFactory<>("coordHipocentro"));
-        colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
-
-        // --- CAMBIO CLAVE: SIMULACIÓN DE SESIÓN ---
-        // Se elimina la dependencia de SeedDatos/MockDatos.
-        // En una aplicación real, esta información vendría de una pantalla de login.
-        // Simulamos que el usuario "lgomez" ha iniciado sesión.
-        Usuario usuarioLogueado = new Usuario("lgomez", null); // El password no es necesario aquí.
+        // --- SIMULACIÓN DE SESIÓN (Se mantiene la lógica original) ---
+        Usuario usuarioLogueado = new Usuario("lgomez", null);
         this.sesionActiva = new Sesion(LocalDateTime.now(), null, usuarioLogueado);
 
+        // Se verifica que el gestor encuentre el empleado para actualizar la etiqueta
         if (txtusername != null && controladorCU.buscarEmpleado(this.sesionActiva) != null) {
             txtusername.setText(controladorCU.buscarEmpleado(this.sesionActiva).getUsuario().getUsername());
         }
 
-        // El gestor ahora obtendrá los datos directamente de la base de datos.
+        // El gestor obtiene los datos de la base de datos.
         controladorCU.registrarResultadoDeRevMan(this.sesionActiva);
     }
 
@@ -105,6 +103,7 @@ public class PantallaRegistrarResultadoDeRevManual {
             imagenSismograma.setVisible(true);
         } else {
             System.out.println("No se pudo generar el sismograma para el evento seleccionado.");
+            imagenSismograma.setVisible(false); // Ocultar si no hay imagen
         }
     }
 
@@ -115,19 +114,19 @@ public class PantallaRegistrarResultadoDeRevManual {
     @FXML
     private void cancelarAccion() {
         refrescarVista();
-        mostrarAlerta("Operacion cancelada. Puede seleccionar otro evento.");
+        mostrarAlerta("Operación cancelada. Puede seleccionar otro evento.");
     }
 
     private void tomarAccion(String accion) {
         if (eventoSeleccionado == null) {
-            mostrarAlerta("No hay ningun evento seleccionado para procesar.");
+            mostrarAlerta("No hay ningún evento seleccionado para procesar.");
             return;
         }
 
         boolean exito = controladorCU.tomarAccion(accion);
 
         if (exito) {
-            mostrarAlerta("El estado del evento sismico ha sido modificado con exito.");
+            mostrarAlerta("El estado del evento sísmico ha sido modificado con éxito.");
             refrescarVista();
         }
     }
@@ -138,6 +137,7 @@ public class PantallaRegistrarResultadoDeRevManual {
         txtClasificacion.clear();
         txtOrigen.clear();
         imagenSismograma.setImage(null);
+        imagenSismograma.setVisible(false); // Asegurar que se oculte
 
         tablaEventos.setDisable(false);
         tablaEventos.getSelectionModel().clearSelection();
@@ -148,21 +148,36 @@ public class PantallaRegistrarResultadoDeRevManual {
         controladorCU.registrarResultadoDeRevMan(this.sesionActiva);
     }
 
+    /**
+     * Muestra una alerta con el estilo de easysmos.
+     * Se ajusta el título y se carga el CSS para estilizar el DialogPane.
+     */
     private void mostrarAlerta(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Revision Manual");
+        alert.setTitle("easysmos - Revisión Manual");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
+
+        // --- INYECCIÓN DE ESTILO CSS para la alerta ---
+        try {
+            DialogPane dialogPane = alert.getDialogPane();
+            // Carga el CSS desde resources/css/easysmos.css
+            dialogPane.getStylesheets().add(getClass().getResource("/css/easysmos.css").toExternalForm());
+            dialogPane.getStyleClass().add("card-panel"); // Usar el estilo de card para la alerta
+        } catch (Exception e) {
+            System.err.println("Error al cargar el CSS para la alerta: " + e.getMessage());
+        }
+
         alert.showAndWait();
     }
 
     @FXML
     private void tomarOptMapaSismico() {
-        System.out.println("Se selecciono la opcion de ver el mapa sismico.");
+        System.out.println("Se seleccionó la opción de ver el mapa sísmico.");
     }
 
     @FXML
     private void tomarOptModificarDatos() {
-        System.out.println("Se selecciono la opcion de modificar datos.");
+        System.out.println("Se seleccionó la opción de modificar datos.");
     }
 }
