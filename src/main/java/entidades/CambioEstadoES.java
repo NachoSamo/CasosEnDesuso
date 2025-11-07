@@ -34,9 +34,9 @@ public class CambioEstadoES {
     @Column(name = "estado_class_name")
     private String estadoClassName;
 
-    public CambioEstadoES(LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin, Empleado responsable, EstadoES estado) {
+    public CambioEstadoES(LocalDateTime fechaHoraInicio, Empleado responsable, EstadoES estado) {
         this.fechaHoraInicio = fechaHoraInicio;
-        this.fechaHoraFin = fechaHoraFin;
+        this.fechaHoraFin = null;
         this.responsable = responsable;
         this.setEstado(estado);
     }

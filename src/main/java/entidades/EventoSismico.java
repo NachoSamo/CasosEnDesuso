@@ -74,12 +74,14 @@ public class EventoSismico {
         this.cambiosEstado = new ArrayList<>();
         EstadoES estadoInicial = new AutoDetectado();
         this.estado = estadoInicial;
-        CambioEstadoES cambioInicial = new CambioEstadoES(LocalDateTime.now(), null, null, estadoInicial);
+        CambioEstadoES cambioInicial = new CambioEstadoES(LocalDateTime.now(), null, estadoInicial);
         this.agregarCE(cambioInicial);;
     }
 
     public void revisar(LocalDateTime fh, Empleado resp) {
-        this.estado.revisar(this, fh, resp);
+
+
+        this.estado.revisar(this, fh, resp, this.cambiosEstado);
     }
 
     public void confirmar(LocalDateTime fh, Empleado resp) {
