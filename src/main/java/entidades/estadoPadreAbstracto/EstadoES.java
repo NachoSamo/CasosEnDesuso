@@ -32,6 +32,10 @@ public abstract class EstadoES {
         throw new UnsupportedOperationException("La operación 'revisar' no es válida en el estado '" + this.getNombre() + "'");
     }
 
+    public void confirmarRevision(EventoSismico es, LocalDateTime fh, Empleado resp, List<CambioEstadoES> cambiosEstado) {
+        throw new UnsupportedOperationException("La operación 'confirmarRevision' no es válida en el estado '" + this.getNombre() + "'");
+    }
+
     public void confirmar(EventoSismico es) {
         throw new UnsupportedOperationException("La operación 'confirmarRevision' no es válida en el estado '" + this.getNombre() + "'");
     }

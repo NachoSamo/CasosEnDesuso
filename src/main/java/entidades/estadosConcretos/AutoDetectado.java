@@ -42,8 +42,7 @@ public class AutoDetectado extends EstadoES {
         es.setEstado(nuevoEstado);
     }
 
-
-    public void rechazar(EventoSismico es, LocalDateTime fh, Empleado resp, List<CambioEstadoES> cambiosEstado) {
+    public void confirmarRevision(EventoSismico es, LocalDateTime fh, Empleado resp, List<CambioEstadoES> cambiosEstado) {
         // 1. Buscar el cambio de estado actual dentro de la lista recibida
         CambioEstadoES actual = null;
         if (cambiosEstado != null) {
@@ -68,4 +67,5 @@ public class AutoDetectado extends EstadoES {
         es.agregarCE(nuevoCambio);
         es.setEstado(nuevoEstado);
     }
+
 }
