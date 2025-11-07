@@ -1,5 +1,6 @@
 package entidades.estadoPadreAbstracto;
 
+import entidades.CambioEstadoES;
 import entidades.Empleado;
 import entidades.EventoSismico;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Clase abstracta que representa el estado de un EventoSismico, aplicando el patrón de diseño State.
@@ -26,11 +28,11 @@ public abstract class EstadoES {
         throw new UnsupportedOperationException("La operación 'registrarSismo' no es válida en el estado '" + this.getNombre() + "'");
     }
 
-    public void revisar(EventoSismico es, LocalDateTime fh, Empleado resp) {
+    public void revisar(EventoSismico es, LocalDateTime fh, Empleado resp, List<CambioEstadoES> cambiosEstado) {
         throw new UnsupportedOperationException("La operación 'revisar' no es válida en el estado '" + this.getNombre() + "'");
     }
 
-    public void confirmarRevision(EventoSismico es) {
+    public void confirmar(EventoSismico es) {
         throw new UnsupportedOperationException("La operación 'confirmarRevision' no es válida en el estado '" + this.getNombre() + "'");
     }
 

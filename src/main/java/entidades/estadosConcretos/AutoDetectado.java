@@ -6,6 +6,7 @@ import entidades.EventoSismico;
 import entidades.estadoPadreAbstracto.EstadoES;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class AutoDetectado extends EstadoES {
 
@@ -13,19 +14,57 @@ public class AutoDetectado extends EstadoES {
         super("AutoDetectado");
     }
 
+
     @Override
-    public void revisar(EventoSismico es, LocalDateTime fh, Empleado resp) {
-        // 1. Finalizar el estado actual
-        CambioEstadoES actual = es.getCambioEstadoActual();
+    public void revisar(EventoSismico es, LocalDateTime fh, Empleado resp, List<CambioEstadoES> cambiosEstado) {
+        // 1. Buscar el cambio de estado actual dentro de la lista recibida
+        CambioEstadoES actual = null;
+        if (cambiosEstado != null) {
+            for (CambioEstadoES ce : cambiosEstado) {
+                if (ce.getFechaHoraFin() == null) {
+                    actual = ce;
+                    break;
+                }
+            }
+        }
+
+        // 2. Finaliza el cambio de estado actual (si existe)
         if (actual != null) {
             actual.setFechaHoraFin(fh);
         }
 
-        // 2. Crear el nuevo estado y el nuevo cambio de estado
+        // 3. Crear el nuevo estado y el nuevo cambio de estado
         EstadoES nuevoEstado = new EnRevision();
-        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, null, resp, nuevoEstado);
+        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, resp, nuevoEstado);
 
-        // 3. Actualizar el evento sísmico (contexto)
+        // 4. Actualizar el evento sísmico (contexto)
+        es.agregarCE(nuevoCambio);
+        es.setEstado(nuevoEstado);
+    }
+
+
+    public void rechazar(EventoSismico es, LocalDateTime fh, Empleado resp, List<CambioEstadoES> cambiosEstado) {
+        // 1. Buscar el cambio de estado actual dentro de la lista recibida
+        CambioEstadoES actual = null;
+        if (cambiosEstado != null) {
+            for (CambioEstadoES ce : cambiosEstado) {
+                if (ce.getFechaHoraFin() == null) {
+                    actual = ce;
+                    break;
+                }
+            }
+        }
+
+        // 2. Finaliza el cambio de estado actual (si existe)
+        if (actual != null) {
+            actual.setFechaHoraFin(fh);
+        }
+
+        // 3. Crear el nuevo estado y el nuevo cambio de estado
+        EstadoES nuevoEstado = new EnRevision();
+        CambioEstadoES nuevoCambio = new CambioEstadoES(fh, resp, nuevoEstado);
+
+        // 4. Actualizar el evento sísmico (contexto)
         es.agregarCE(nuevoCambio);
         es.setEstado(nuevoEstado);
     }
