@@ -2,6 +2,7 @@ package entidades;
 
 import entidades.estadoPadreAbstracto.EstadoES;
 import entidades.estadosConcretos.AutoDetectado;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,13 @@ import java.util.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "eventos_sismicos")
 public class EventoSismico {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
     private LocalDateTime fechaHoraFin;
     private LocalDateTime fechaHoraOcurrencia;
@@ -22,13 +29,32 @@ public class EventoSismico {
     private String longitudHipocentro;
     private double valorMagnitud;
     private LocalDateTime fechaHoraRevision;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "responsable_revision_id")
     private Empleado responsableRevision;
-    private List<CambioEstadoES> cambiosEstado;
+
+    @OneToMany(mappedBy = "eventoSismico", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<CambioEstadoES> cambiosEstado = new ArrayList<>();
+
+    @Transient
     private EstadoES estado;
+
+    @Column(name = "estado_actual_class_name") // Se guarda el nombre de la clase del estado.
+    private String estadoActualClassName;
+
+    @Embedded
     private ClasificacionSismo clasificacionSismo;
+
+    @Embedded
     private AlcanceSismo alcanceSismo;
+
+    @Embedded
     private OrigenDeGeneracion origenGeneracion;
-    private List<SerieTemporal> seriesTemporales;
+
+
+    @Transient
+    private List<SerieTemporal> seriesTemporales = new ArrayList<>();
 
     public EventoSismico(LocalDateTime fechaHoraOcurrencia, String latitudEpicentro, String longitudEpicentro,
                          String latitudHipocentro, String longitudHipocentro, double valorMagnitud,
@@ -48,7 +74,8 @@ public class EventoSismico {
         this.cambiosEstado = new ArrayList<>();
         EstadoES estadoInicial = new AutoDetectado();
         this.estado = estadoInicial;
-        this.cambiosEstado.add(new CambioEstadoES(LocalDateTime.now(), null, null, estadoInicial));
+        CambioEstadoES cambioInicial = new CambioEstadoES(LocalDateTime.now(), null, null, estadoInicial);
+        this.agregarCE(cambioInicial);;
     }
 
     public void revisar(LocalDateTime fh, Empleado resp) {
@@ -68,7 +95,11 @@ public class EventoSismico {
     }
 
     public void agregarCE(CambioEstadoES nuevoCambio) {
+        if (this.cambiosEstado == null) {
+            this.cambiosEstado = new ArrayList<>();
+        }
         this.cambiosEstado.add(nuevoCambio);
+        nuevoCambio.setEventoSismico(this);
     }
 
     public CambioEstadoES getCambioEstadoActual() {
@@ -137,6 +168,28 @@ public class EventoSismico {
             }
         }
         return resultado;
+    }
+
+    public void setEstado(EstadoES estado) {
+        this.estado = estado;
+        if (estado != null) {
+            this.estadoActualClassName = estado.getClass().getName();
+        } else {
+            this.estadoActualClassName = null;
+        }
+    }
+
+    @PostLoad
+    private void rehidratarEstado() {
+        if (this.estadoActualClassName != null) {
+            try {
+                Class<?> clazz = Class.forName(this.estadoActualClassName);
+                this.estado = (EstadoES) clazz.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                System.err.println("Error al rehidratar el estado del evento: " + e.getMessage());
+                this.estado = null;
+            }
+        }
     }
 
     @Override

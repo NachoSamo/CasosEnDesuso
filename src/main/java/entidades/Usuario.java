@@ -1,20 +1,30 @@
 package entidades;
 
 import java.util.Objects;
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "usuarios")
 public class Usuario {
+
+    @Id
     private String username;
+
     private String password;
 
-    // ✅ Comparación por username
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
