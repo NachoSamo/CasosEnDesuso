@@ -2,8 +2,8 @@ package boundary;
 
 import gestor.GestorRevManual;
 import entidades.EventoSismico;
-import entidades.MockDatos;
 import entidades.Sesion;
+import entidades.Usuario;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -37,19 +38,11 @@ public class PantallaRegistrarResultadoDeRevManual {
     private EventoSismico eventoSeleccionado;
     private final GestorRevManual controladorCU = new GestorRevManual();
 
-    public void setSesion(Sesion sesion) {
-        this.sesionActiva = sesion;
-    }
-
-    // Este método es llamado automáticamente por JavaFX después de cargar el FXML.
-    // Lo usamos para configuraciones iniciales que no dependen de la acción del usuario.
     @FXML
     public void initialize() {
         controladorCU.setBoundary(this);
     }
 
-    // Este método es llamado por el botón "Registrar Resultado".
-    // Ahora contiene toda la lógica de preparación de la pantalla.
     @FXML
     private void iniciarCU() {
         vistaInicial.setVisible(false);
@@ -60,21 +53,23 @@ public class PantallaRegistrarResultadoDeRevManual {
         seccionBottom.setVisible(true);
         seccionBottom.setManaged(true);
 
-        // Configurar la tabla una sola vez
         colFechaHora.setCellValueFactory(new PropertyValueFactory<>("fechaHoraOcurrenciaTexto"));
         colEpicentro.setCellValueFactory(new PropertyValueFactory<>("coordEpicentro"));
         colHipocentro.setCellValueFactory(new PropertyValueFactory<>("coordHipocentro"));
         colMagnitud.setCellValueFactory(new PropertyValueFactory<>("valorMagnitud"));
 
-        // Obtener sesión y cargar datos iniciales
-        List<Sesion> sesiones = MockDatos.obtenerSesionesMock();
-        this.sesionActiva = Sesion.obtenerSesionActiva(sesiones);
+        // --- CAMBIO CLAVE: SIMULACIÓN DE SESIÓN ---
+        // Se elimina la dependencia de SeedDatos/MockDatos.
+        // En una aplicación real, esta información vendría de una pantalla de login.
+        // Simulamos que el usuario "lgomez" ha iniciado sesión.
+        Usuario usuarioLogueado = new Usuario("lgomez", null); // El password no es necesario aquí.
+        this.sesionActiva = new Sesion(LocalDateTime.now(), null, usuarioLogueado);
 
         if (txtusername != null && controladorCU.buscarEmpleado(this.sesionActiva) != null) {
             txtusername.setText(controladorCU.buscarEmpleado(this.sesionActiva).getUsuario().getUsername());
         }
 
-        // Llamada UNICA al gestor para poblar la tabla
+        // El gestor ahora obtendrá los datos directamente de la base de datos.
         controladorCU.registrarResultadoDeRevMan(this.sesionActiva);
     }
 
@@ -86,8 +81,6 @@ public class PantallaRegistrarResultadoDeRevManual {
     private void tomarSeleccionES() {
         eventoSeleccionado = tablaEventos.getSelectionModel().getSelectedItem();
         if (eventoSeleccionado == null) {
-            // No mostrar alerta si solo se está haciendo clic en la tabla,
-            // solo cuando se intenta realizar una acción sin selección.
             return;
         }
 
@@ -98,6 +91,7 @@ public class PantallaRegistrarResultadoDeRevManual {
 
     public Map<String, String> mostrarDetalleES(Map<String, String> aco) {
         txtEventoSeleccionado.setText(eventoSeleccionado.getFechaHoraOcurrencia().toString());
+        // Se asume que los objetos embeddable no son nulos
         txtAlcance.setText(aco.getOrDefault("alcance", ""));
         txtClasificacion.setText(aco.getOrDefault("clasificacion", ""));
         txtOrigen.setText(aco.getOrDefault("origen", ""));
@@ -133,7 +127,7 @@ public class PantallaRegistrarResultadoDeRevManual {
         boolean exito = controladorCU.tomarAccion(accion);
 
         if (exito) {
-            mostrarAlerta("El estado del evento sismico ha sido modificado con éxito.");
+            mostrarAlerta("El estado del evento sismico ha sido modificado con exito.");
             refrescarVista();
         }
     }
@@ -149,7 +143,8 @@ public class PantallaRegistrarResultadoDeRevManual {
         tablaEventos.getSelectionModel().clearSelection();
         this.eventoSeleccionado = null;
 
-        // Recargar la lista de eventos pendientes llamando al gestor
+        // Recargar la lista de eventos pendientes llamando al gestor,
+        // quien consultará la base de datos.
         controladorCU.registrarResultadoDeRevMan(this.sesionActiva);
     }
 
@@ -160,8 +155,6 @@ public class PantallaRegistrarResultadoDeRevManual {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
-
-    // --- METODOS FALTANTES REINCORPORADOS ---
 
     @FXML
     private void tomarOptMapaSismico() {

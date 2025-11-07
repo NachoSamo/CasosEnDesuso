@@ -1,23 +1,35 @@
 package gestor;
 
 import boundary.PantallaRegistrarResultadoDeRevManual;
-import imagenSismograma.GenerarSismograma;
-import entidades.*;
+import imagenSismograma.GenerarSismograma; // Asegúrate de que este import sea correcto
+import entidades.Empleado;
+import entidades.EventoSismico;
+import entidades.Sesion;
+import entidades.Usuario;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import persistence.repositorios.EmpleadoRepository;
+import persistence.repositorios.EmpleadoRepositoryPostgreSql;
+import persistence.repositorios.EventoSismicoRepository;
+import persistence.repositorios.EventoSismicoRepositoryPostgreSql;
 
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class GestorRevManual {
 
     private Empleado empleadoResponsable;
-    private List<Empleado> empleadosSistema;
-    private List<EventoSismico> eventosSimulados;
     private EventoSismico eventoSeleccionado;
+
+    // Se reemplazan las listas en memoria por los repositorios
+    private final EventoSismicoRepository eventoRepository;
+    private final EmpleadoRepository empleadoRepository;
+
     private final GenerarSismograma controladorSismograma = new GenerarSismograma();
     private PantallaRegistrarResultadoDeRevManual boundaryRef;
 
@@ -26,59 +38,55 @@ public class GestorRevManual {
     }
 
     public GestorRevManual() {
-        empleadosSistema = MockDatos.obtenerEmpleadosMock();
-        eventosSimulados = MockDatos.obtenerEventosMock();
+        // Se inicializan los repositorios en lugar de cargar datos a memoria
+        this.eventoRepository = new EventoSismicoRepositoryPostgreSql();
+        this.empleadoRepository = new EmpleadoRepositoryPostgreSql();
     }
 
-    public List<EventoSismico> registrarResultadoDeRevMan(Sesion sesionActiva) {
+    public void registrarResultadoDeRevMan(Sesion sesionActiva) {
         this.empleadoResponsable = buscarEmpleado(sesionActiva);
+
+        // La búsqueda y el ordenamiento ahora se delegan a la base de datos
         List<EventoSismico> eventos = buscarESAutodetectados();
-        List<EventoSismico> ordenados = ordenarESPorFechaHoraOcurrencia(eventos);
 
         if (boundaryRef != null) {
-            boundaryRef.mostrarES(ordenados);
+            boundaryRef.mostrarES(eventos);
         }
-        return ordenados;
     }
 
     public Empleado buscarEmpleado(Sesion sesionActiva) {
-        if (sesionActiva == null) return null;
-        Usuario usuarioSesion = sesionActiva.getUsuario();
-        for (Empleado emp : empleadosSistema) {
-            if (emp.esTuUsuario(usuarioSesion)) {
-                return emp;
-            }
+        if (sesionActiva == null || sesionActiva.getUsuario() == null) {
+            return null;
         }
-        return null;
+        String username = sesionActiva.getUsuario().getUsername();
+
+        // Se busca directamente en la base de datos por username
+        Optional<Empleado> empleadoOpt = empleadoRepository.findByUsername(username);
+        return empleadoOpt.orElse(null);
     }
 
     public List<EventoSismico> buscarESAutodetectados() {
-        return eventosSimulados.stream()
-                .filter(EventoSismico::soyAutoDetectado)
-                .collect(Collectors.toList());
-    }
-
-    public List<EventoSismico> ordenarESPorFechaHoraOcurrencia(List<EventoSismico> eventos) {
-        return eventos.stream()
-                .sorted(Comparator.comparing(EventoSismico::getFechaHoraOcurrencia))
-                .collect(Collectors.toList());
+        // Se consulta directamente a la base de datos
+        return eventoRepository.findAllAutoDetectados();
     }
 
     public void tomarSeleccionES(EventoSismico evento) {
         this.eventoSeleccionado = evento;
         LocalDateTime fechaActual = getFechaHoraActual();
-        revisar(evento, fechaActual);
+
+        // La lógica de negocio no cambia: modifica el objeto en memoria
+        evento.revisar(fechaActual, this.empleadoResponsable);
+
+        // Persistimos el cambio de estado a "EnRevision" inmediatamente
+        this.eventoRepository.save(this.eventoSeleccionado);
+
+        System.out.println("Evento ID: " + evento.getId() + " ha sido puesto en estado 'EnRevision'.");
+
         buscarDetallesES();
     }
 
     public LocalDateTime getFechaHoraActual() {
         return LocalDateTime.now();
-    }
-
-    public void revisar(EventoSismico ev, LocalDateTime fechaActual) {
-        if (ev != null) {
-            ev.revisar(fechaActual, this.empleadoResponsable);
-        }
     }
 
     public Map<String, String> buscarDetallesES() {
@@ -92,44 +100,37 @@ public class GestorRevManual {
         return controladorSismograma.ejecutar(evento);
     }
 
-    // --- METODO CLAVE MODIFICADO ---
     public boolean tomarAccion(String accion) {
         if (eventoSeleccionado == null || accion == null) return false;
         LocalDateTime fechaActual = this.getFechaHoraActual();
 
         try {
+            // La lógica de negocio modifica el estado del objeto en memoria
             switch (accion.toLowerCase()) {
-                case "confirmar" -> {
-                    eventoSeleccionado.confirmar(fechaActual, empleadoResponsable);
-                    String estadoNombre = eventoSeleccionado.getEstado() != null ? eventoSeleccionado.getEstado().getNombre() : "UNKNOWN";
-                    String msg = "Estado del evento sismico: " + eventoSeleccionado.toString() + " ha sido cambiado a " + estadoNombre;
-                    System.out.println(msg);
-                }
-                case "rechazar" -> {
-                    eventoSeleccionado.rechazar(fechaActual, empleadoResponsable);
-                    String estadoNombre = eventoSeleccionado.getEstado() != null ? eventoSeleccionado.getEstado().getNombre() : "UNKNOWN";
-                    String msg = "Estado del evento sismico: " + eventoSeleccionado.toString() + " ha sido cambiado a " + estadoNombre;
-                    System.out.println(msg);
-                }
-                case "derivar" -> {
-                    eventoSeleccionado.derivar(fechaActual, empleadoResponsable);
-                    String estadoNombre = eventoSeleccionado.getEstado() != null ? eventoSeleccionado.getEstado().getNombre() : "UNKNOWN";
-                    String msg = "Estado del evento sismico: " + eventoSeleccionado.toString() + " ha sido cambiado a " + estadoNombre;
-                    System.out.println(msg);
-                }
+                case "confirmar" -> eventoSeleccionado.confirmar(fechaActual, empleadoResponsable);
+                case "rechazar" -> eventoSeleccionado.rechazar(fechaActual, empleadoResponsable);
+                case "derivar" -> eventoSeleccionado.derivar(fechaActual, empleadoResponsable);
                 default -> {
                     System.out.println("Accion no reconocida: " + accion);
-                    return false; // Indica que la acción no se encontró
+                    return false;
                 }
             }
-            return true; // Indica éxito
+
+            // --- PASO CLAVE: PERSISTIR EL CAMBIO ---
+            // Se guardan los cambios del objeto modificado en la base de datos.
+            this.eventoRepository.save(this.eventoSeleccionado);
+
+            String estadoNombre = eventoSeleccionado.getEstado().getNombre();
+            System.out.println("Evento ID: " + eventoSeleccionado.getId() + " ha sido cambiado al estado: " + estadoNombre + ". Persistido en la BD.");
+
+            return true;
         } catch (UnsupportedOperationException | IllegalStateException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Operacion Invalida");
             alert.setHeaderText("La accion no se puede realizar.");
             alert.setContentText(e.getMessage());
             alert.showAndWait();
-            return false; // Indica fracaso
+            return false;
         }
     }
 
